@@ -11,7 +11,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gorilla/feeds"
 	rf "github.com/meinside/rss-feeds-go"
+	ssg "github.com/meinside/simple-scrapper-go"
 )
 
 const (
@@ -40,15 +42,35 @@ func run(conf config) {
 				log.Printf("> periodically processing feeds from urls: %s", strings.Join(feedConfig.FeedURLs, ", "))
 			}
 
-			// fetch feeds periodically,
+			// run periodically:
 			go func(client *rf.Client) {
 				ticker := time.NewTicker(time.Duration(conf.FetchFeedsIntervalMinutes) * time.Minute)
 				for range ticker.C {
+					// delete old caches
+					client.DeleteOldCachedItems()
+
+					// fetch feeds,
 					if feeds, err := client.FetchFeeds(true); err == nil {
 						// summarize and cache them,
-						err := client.SummarizeAndCacheFeeds(feeds)
-						if err != nil {
-							log.Printf("# summary failed with some errors: %s", err)
+						if numItems(feeds) > 0 {
+							// try creating a new scrapper,
+							scrapper := newScrapper()
+							if scrapper != nil {
+								// scrap + summarize, and cache feeds
+								if err := client.SummarizeAndCacheFeeds(feeds, scrapper); err != nil {
+									log.Printf("# summary with scrapper failed with some errors: %s", err)
+								}
+
+								// close the scrapper,
+								if err := scrapper.Close(); err != nil {
+									log.Printf("# failed to close scrapper: %s", err)
+								}
+							} else {
+								// or just fetch + summarize, and cache feeds
+								if err := client.SummarizeAndCacheFeeds(feeds); err != nil {
+									log.Printf("# summary failed with some errors: %s", err)
+								}
+							}
 						}
 
 						// fetch cached (summarized) items,
@@ -67,9 +89,6 @@ func run(conf config) {
 					} else {
 						log.Printf("# failed to fetch feeds: %s", err)
 					}
-
-					// delete old caches
-					client.DeleteOldCachedItems()
 				}
 			}(client)
 
@@ -157,4 +176,30 @@ func requestPermitted(r *http.Request, conf config) bool {
 
 	return true
 
+}
+
+// count number of all items of given feeds `fs`
+func numItems(fs []feeds.RssFeed) (num int) {
+	for _, feed := range fs {
+		num += len(feed.Items)
+	}
+	return num
+}
+
+// create a new scrapper
+func newScrapper() *ssg.Scrapper {
+	if scrapper, err := ssg.NewScrapper(); err == nil {
+		scrapper.SetURLReplacer(func(from string) string {
+			if strings.HasPrefix(from, "https://www.reddit.com/") {
+				return strings.ReplaceAll(from, "www.reddit.com", "old.reddit.com")
+			}
+			return from
+		})
+
+		return scrapper
+	} else {
+		log.Printf("# failed to create a new scrapper: %s", err)
+	}
+
+	return nil
 }
