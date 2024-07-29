@@ -189,16 +189,23 @@ func numItems(fs []feeds.RssFeed) (num int) {
 // create a new scrapper
 func newScrapper() *ssg.Scrapper {
 	if scrapper, err := ssg.NewScrapper(); err == nil {
+		// replace urls if needed
 		scrapper.SetURLReplacer(func(from string) string {
+			// www.reddit.com => old.reddit.com
 			if strings.HasPrefix(from, "https://www.reddit.com/") {
 				return strings.ReplaceAll(from, "www.reddit.com", "old.reddit.com")
 			}
+			// default: return it as-is
 			return from
 		})
+
+		// selector for specific urls
 		scrapper.SetSelectorReturner(func(from string) string {
-			if strings.Contains(from, "https://x.com/") {
+			// x.com => div[data-testid="tweetText"]
+			if strings.HasPrefix(from, "https://x.com/") {
 				return `div[data-testid="tweetText"]`
 			}
+			// default: `body`
 			return `body`
 		})
 
