@@ -195,6 +195,12 @@ func newScrapper() *ssg.Scrapper {
 			}
 			return from
 		})
+		scrapper.SetSelectorReturner(func(from string) string {
+			if strings.Contains(from, "https://x.com/") {
+				return `div[data-testid="tweetText"]`
+			}
+			return `body`
+		})
 
 		return scrapper
 	} else {
