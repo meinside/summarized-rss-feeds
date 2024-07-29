@@ -4,7 +4,7 @@ go 1.22.5
 
 require (
 	github.com/gorilla/feeds v1.2.0
-	github.com/meinside/rss-feeds-go v0.0.17
+	github.com/meinside/rss-feeds-go v0.0.18
 	github.com/meinside/simple-scrapper-go v0.0.1
 )
 
