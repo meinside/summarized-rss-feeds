@@ -48,7 +48,9 @@ Create `config.json` file with content:
 
 This application will poll new feeds from `rss_feeds[].feed_urls` with interval of `fetch_feeds_interval_minutes`.
 
-Fetched feeds' contents will be summarized in `desired_language` with your `google_ai_api_key`, and cached in `rss_feeds[].cache_filename` in `db_files_dir`.
+Then the contents of the new feeds will be fetched using [playwright-go and/or goquery](https://github.com/meinside/simple-scrapper-go).
+
+Fetched contents will be summarized in `desired_language` with your `google_ai_api_key`, and cached in `rss_feeds[].cache_filename` in `db_files_dir`.
 
 Resulting RSS feeds' RSS XML will be served on: yourserver:`rss_server_port`/`rss_feeds[].serve_path`(eg. `localhost:8080/tech`).
 
