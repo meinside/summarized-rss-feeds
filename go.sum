@@ -89,8 +89,8 @@ github.com/mattn/go-sqlite3 v1.14.22 h1:2gZY6PC6kBnID23Tichd1K+Z0oS6nE/XwU+Vz/5o
 github.com/mattn/go-sqlite3 v1.14.22/go.mod h1:Uh1q+B4BYcTPb+yiD3kU8Ct7aC0hY9fxUwlHK0RXw+Y=
 github.com/meinside/randomized-string-generator-go v0.0.1 h1:Pz1rHWe6QY5SKk68/XbYJBtA4Qro4JdxfUtzEMnjWC0=
 github.com/meinside/randomized-string-generator-go v0.0.1/go.mod h1:3Vw7LjCeK+xoR3y91MDZgoe3HgfxZvFZ8q2Mi3k3yx4=
-github.com/meinside/rss-feeds-go v0.0.17 h1:DyQet8jIFdSj0R22I0EQ2zggJPMCiwA06VxtzWeMitU=
-github.com/meinside/rss-feeds-go v0.0.17/go.mod h1:FvCnZRTbX8DNDDitBhpBBd5B/zLbNH1w4N6ERiMzPCs=
+github.com/meinside/rss-feeds-go v0.0.18 h1:4+6frvdrSWs3x53CS3VuKVUFEWDAMH8HQCPHPqsoPR4=
+github.com/meinside/rss-feeds-go v0.0.18/go.mod h1:FvCnZRTbX8DNDDitBhpBBd5B/zLbNH1w4N6ERiMzPCs=
 github.com/meinside/simple-scrapper-go v0.0.1 h1:gM8JYK3rjbhCT3JRZDNOS/Dhx28IX6El17qvToTuUBE=
 github.com/meinside/simple-scrapper-go v0.0.1/go.mod h1:2ruOtyf9eixZHlHX8HgA98KlC2psZ/K6M0Q+FtBrUa8=
 github.com/mitchellh/go-ps v1.0.0 h1:i6ampVEEF4wQFF+bkYfwYgY+F/uYJDktmvLPf7qIgjc=
