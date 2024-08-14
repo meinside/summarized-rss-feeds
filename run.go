@@ -147,6 +147,8 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed) {
 				} else {
 					log.Printf("# failed to serve RSS feeds: %s", err)
 				}
+			} else {
+				w.WriteHeader(http.StatusUnauthorized)
 			}
 		})
 	}
