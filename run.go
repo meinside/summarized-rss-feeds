@@ -193,9 +193,16 @@ func newScrapper() *ssg.Scrapper {
 	if scrapper, err := ssg.NewScrapper(); err == nil {
 		// replace urls if needed
 		scrapper.SetURLReplacer(func(from string) string {
-			// www.reddit.com => old.reddit.com
 			if strings.HasPrefix(from, "https://www.reddit.com/") {
+				// www.reddit.com => old.reddit.com
 				return strings.ReplaceAll(from, "www.reddit.com", "old.reddit.com")
+			} else if strings.HasPrefix(from, "https://www.nytimes.com/") ||
+				strings.HasPrefix(from, "https://www.wsj.com/") ||
+				strings.HasPrefix(from, "https://www.washingtonpost.com/") ||
+				strings.HasPrefix(from, "https://www.economist.com/") ||
+				strings.HasPrefix(from, "https://www.ft.com/") {
+				// use https://www.paywallskip.com/
+				return "https://www.paywallskip.com/article?url=" + from
 			}
 			// default: return it as-is
 			return from
