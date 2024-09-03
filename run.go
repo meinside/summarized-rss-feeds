@@ -24,6 +24,16 @@ const (
 	defaultPublishEmail       = "noreply@no-such-domain.com"
 )
 
+// paywalled sites' urls
+var _paywalledSitesURLs = []string{
+	"https://www.nytimes.com/",
+	"https://www.wsj.com/",
+	"https://www.washingtonpost.com/",
+	"https://www.economist.com/",
+	"https://www.ft.com/",
+	"https://www.theguardian.com/",
+}
+
 // run with config
 func run(conf config) {
 	if conf.Verbose {
@@ -196,14 +206,13 @@ func newScrapper() *ssg.Scrapper {
 			if strings.HasPrefix(from, "https://www.reddit.com/") {
 				// www.reddit.com => old.reddit.com
 				return strings.ReplaceAll(from, "www.reddit.com", "old.reddit.com")
-			} else if strings.HasPrefix(from, "https://www.nytimes.com/") ||
-				strings.HasPrefix(from, "https://www.wsj.com/") ||
-				strings.HasPrefix(from, "https://www.washingtonpost.com/") ||
-				strings.HasPrefix(from, "https://www.economist.com/") ||
-				strings.HasPrefix(from, "https://www.ft.com/") {
+			} else if slices.ContainsFunc(_paywalledSitesURLs, func(url string) bool {
+				return strings.HasPrefix(from, url)
+			}) {
 				// use https://www.paywallskip.com/
 				return "https://www.paywallskip.com/article?url=" + from
 			}
+
 			// default: return it as-is
 			return from
 		})
