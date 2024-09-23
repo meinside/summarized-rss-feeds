@@ -4,7 +4,7 @@ go 1.23.1
 
 require (
 	github.com/gorilla/feeds v1.2.0
-	github.com/meinside/rss-feeds-go v0.0.29
+	github.com/meinside/rss-feeds-go v0.0.30
 	github.com/meinside/simple-scrapper-go v0.0.3
 )
 
@@ -33,7 +33,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-sqlite3 v1.14.23 // indirect
-	github.com/meinside/gemini-things-go v0.0.3 // indirect
+	github.com/meinside/gemini-things-go v0.0.4 // indirect
 	github.com/meinside/randomized-string-generator-go v0.0.1 // indirect
 	github.com/playwright-community/playwright-go v0.4701.0 // indirect
 	github.com/tailscale/hujson v0.0.0-20221223112325-20486734a56a // indirect
