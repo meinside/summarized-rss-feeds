@@ -52,6 +52,15 @@ func run(conf config) {
 				log.Printf("> periodically processing feeds from urls: %s", strings.Join(feedConfig.FeedURLs, ", "))
 			}
 
+			// try creating a new scrapper,
+			scrapper := newScrapper()
+			defer func() {
+				// close the scrapper,
+				if err := scrapper.Close(); err != nil {
+					log.Printf("# failed to close scrapper: %s", err)
+				}
+			}()
+
 			// run periodically:
 			go func(client *rf.Client) {
 				ticker := time.NewTicker(time.Duration(conf.FetchFeedsIntervalMinutes) * time.Minute)
@@ -63,22 +72,15 @@ func run(conf config) {
 					if feeds, err := client.FetchFeeds(true); err == nil {
 						// summarize and cache them,
 						if numItems(feeds) > 0 {
-							// try creating a new scrapper,
-							scrapper := newScrapper()
 							if scrapper != nil {
 								// scrap + summarize, and cache feeds
 								if err := client.SummarizeAndCacheFeeds(feeds, scrapper); err != nil {
-									log.Printf("# summary with scrapper failed with some errors: %s", err)
-								}
-
-								// close the scrapper,
-								if err := scrapper.Close(); err != nil {
-									log.Printf("# failed to close scrapper: %s", err)
+									log.Printf("# summary with scrapper failed: %s", err)
 								}
 							} else {
 								// or just fetch + summarize, and cache feeds
 								if err := client.SummarizeAndCacheFeeds(feeds); err != nil {
-									log.Printf("# summary failed with some errors: %s", err)
+									log.Printf("# summary failed: %s", err)
 								}
 							}
 						}
@@ -151,7 +153,13 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed) {
 					w.Header().Set("Content-Type", "application/rss+xml")
 					w.Header().Set("Cache-Control", "max-age=60")
 
-					if _, err := io.WriteString(w, string(bytes)); err != nil {
+					if _, err := func() (n int, err error) {
+						var s string = string(bytes)
+						if sw, ok := io.Writer(w).(io.StringWriter); ok {
+							return sw.WriteString(s)
+						}
+						return io.Writer(w).Write([]byte(s))
+					}(); err != nil {
 						log.Printf("# failed to write data: %s", err)
 					}
 				} else {
