@@ -63,7 +63,7 @@ func run(conf config) {
 
 			// run periodically:
 			go func(client *rf.Client) {
-				ticker := time.NewTicker(time.Duration(conf.FetchFeedsIntervalMinutes) * time.Minute)
+				ticker := time.NewTicker(time.Duration(conf.FetchFeedsIntervalSeconds) * time.Second)
 				for range ticker.C {
 					// delete old caches
 					client.DeleteOldCachedItems()

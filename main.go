@@ -12,7 +12,7 @@ const (
 	defaultGoogleAIModel   = "gemini-1.5-flash-latest"
 	defaultDesiredLanguage = "English"
 
-	defaultFetchFeedsIntervalMinutes = 5
+	defaultFetchFeedsIntervalSeconds = 300
 )
 
 // config struct
@@ -26,7 +26,7 @@ type config struct {
 
 	// RSS
 	RSSFeeds                  []configRSSFeed `json:"rss_feeds"`
-	FetchFeedsIntervalMinutes int             `json:"fetch_feeds_interval_minutes,omitempty"`
+	FetchFeedsIntervalSeconds int             `json:"fetch_feeds_interval_seconds,omitempty"`
 	PermittedUserAgents       []string        `json:"permitted_user_agents,omitempty"`
 
 	// RSS server port
@@ -60,8 +60,8 @@ func readConfig(filepath string) (conf config, err error) {
 				if conf.DesiredLanguage == nil {
 					conf.DesiredLanguage = ptr(defaultDesiredLanguage)
 				}
-				if conf.FetchFeedsIntervalMinutes <= 0 {
-					conf.FetchFeedsIntervalMinutes = defaultFetchFeedsIntervalMinutes
+				if conf.FetchFeedsIntervalSeconds <= 0 {
+					conf.FetchFeedsIntervalSeconds = defaultFetchFeedsIntervalSeconds
 				}
 
 				return conf, nil
