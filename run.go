@@ -52,15 +52,6 @@ func run(conf config) {
 				log.Printf("> periodically processing feeds from urls: %s", strings.Join(feedConfig.FeedURLs, ", "))
 			}
 
-			// try creating a new scrapper,
-			scrapper := newScrapper()
-			defer func() {
-				// close the scrapper,
-				if err := scrapper.Close(); err != nil {
-					log.Printf("# failed to close scrapper: %s", err)
-				}
-			}()
-
 			// run periodically:
 			go func(client *rf.Client) {
 				ticker := time.NewTicker(time.Duration(conf.FetchFeedsIntervalSeconds) * time.Second)
@@ -72,10 +63,17 @@ func run(conf config) {
 					if feeds, err := client.FetchFeeds(true); err == nil {
 						// summarize and cache them,
 						if numItems(feeds) > 0 {
+							// try creating a new scrapper,
+							scrapper := newScrapper()
 							if scrapper != nil {
 								// scrap + summarize, and cache feeds
 								if err := client.SummarizeAndCacheFeeds(feeds, scrapper); err != nil {
 									log.Printf("# summary with scrapper failed: %s", err)
+								}
+
+								// close the scrapper,
+								if err := scrapper.Close(); err != nil {
+									log.Printf("# failed to close scrapper: %s", err)
 								}
 							} else {
 								// or just fetch + summarize, and cache feeds
