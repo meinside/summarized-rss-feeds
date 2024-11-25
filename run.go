@@ -227,7 +227,7 @@ func newScrapper() *ssg.Scrapper {
 		scrapper.SetSelectorReturner(func(from string) string {
 			// x.com => div[data-testid="tweetText"]
 			if strings.HasPrefix(from, "https://x.com/") {
-				return `div[data-testid="tweetText"]`
+				return `article[data-testid='tweet']`
 			}
 			// default: `body`
 			return `body`
