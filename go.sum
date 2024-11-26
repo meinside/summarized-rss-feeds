@@ -95,6 +95,8 @@ github.com/meinside/randomized-string-generator-go v0.0.1 h1:Pz1rHWe6QY5SKk68/Xb
 github.com/meinside/randomized-string-generator-go v0.0.1/go.mod h1:3Vw7LjCeK+xoR3y91MDZgoe3HgfxZvFZ8q2Mi3k3yx4=
 github.com/meinside/rss-feeds-go v0.1.8 h1:iYe62GaBpmZekch4MYWl6UWhNrLTo70ck+5A24/pE1E=
 github.com/meinside/rss-feeds-go v0.1.8/go.mod h1:N8mAVenoouzXQKYs0fkCTU0JjNZCRllHd1KNKhLAalY=
+github.com/meinside/simple-scrapper-go v0.0.6 h1:FohbDBUrcbRzPC7WdINHFI3JGtfCqB6cO1OCHMj+Onw=
+github.com/meinside/simple-scrapper-go v0.0.6/go.mod h1:hJAfb3QNrMkmlvSMHCYfiRkZXccbqGi5o0QZnxpHhP0=
 github.com/mitchellh/go-ps v1.0.0 h1:i6ampVEEF4wQFF+bkYfwYgY+F/uYJDktmvLPf7qIgjc=
 github.com/mitchellh/go-ps v1.0.0/go.mod h1:J4lOc8z8yJs6vUwklHw2XEIiT4z4C40KtWVN3nvg8Pg=
 github.com/playwright-community/playwright-go v0.4802.0 h1:FSuvi5Pg/xp+n7vFpu2wGldwSQ3grsaDlHFRfHRQiy4=

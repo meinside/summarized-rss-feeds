@@ -8,8 +8,6 @@ require (
 	github.com/meinside/simple-scrapper-go v0.0.6
 )
 
-replace github.com/meinside/simple-scrapper-go => ../simple-scrapper-go/
-
 require (
 	cloud.google.com/go v0.116.0 // indirect
 	cloud.google.com/go/ai v0.9.0 // indirect
