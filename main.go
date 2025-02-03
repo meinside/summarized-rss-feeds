@@ -45,6 +45,8 @@ type configRSSFeed struct {
 	PublishDescription *string `json:"publish_description,omitempty"`
 	PublishAuthor      *string `json:"publish_author,omitempty"`
 	PublishEmail       *string `json:"publish_email,omitempty"`
+
+	DropItemsWithFailedSummaries bool `json:"drop_items_with_failed_summaries,omitempty"`
 }
 
 // read config from given `filepath`

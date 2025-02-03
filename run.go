@@ -146,6 +146,11 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed) {
 				// fetch cached items,
 				items := client.ListCachedItems(true)
 
+				// drop items with failed summaries
+				if feedConf.DropItemsWithFailedSummaries {
+					items = dropItemsWithFailedSummaries(items)
+				}
+
 				// generate xml and serve it
 				if bytes, err := client.PublishXML(rssTitle, rssLink, rssDescription, rssAuthor, rssEmail, items); err == nil {
 					w.Header().Set("Content-Type", "application/rss+xml")
@@ -193,7 +198,6 @@ func requestPermitted(r *http.Request, conf config) bool {
 	}
 
 	return true
-
 }
 
 // count number of all items of given feeds `fs`
@@ -239,4 +243,11 @@ func newScrapper() *ssg.Scrapper {
 	}
 
 	return nil
+}
+
+// drop items with failed summaries
+func dropItemsWithFailedSummaries(items []rf.CachedItem) []rf.CachedItem {
+	return slices.DeleteFunc(items, func(item rf.CachedItem) bool {
+		return strings.Contains(item.Summary, "Summary failed with error:")
+	})
 }
