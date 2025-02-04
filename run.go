@@ -248,6 +248,6 @@ func newScrapper() *ssg.Scrapper {
 // drop items with failed summaries
 func dropItemsWithFailedSummaries(items []rf.CachedItem) []rf.CachedItem {
 	return slices.DeleteFunc(items, func(item rf.CachedItem) bool {
-		return strings.Contains(item.Summary, "Summary failed with error:")
+		return strings.Contains(item.Summary, rf.ErrorPrefixSummaryFailedWithError)
 	})
 }
