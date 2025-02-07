@@ -12,7 +12,7 @@ const (
 	defaultGoogleAIModel   = "gemini-1.5-flash-latest"
 	defaultDesiredLanguage = "English"
 
-	defaultFetchFeedsIntervalSeconds = 300
+	defaultFetchFeedsIntervalSeconds = 60 * 3 // = 3 minutes
 )
 
 // config struct
