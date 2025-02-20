@@ -15,7 +15,7 @@ Create `config.json` file with content:
 ```json
 {
   "google_ai_api_key": "AIabcdefghijklmnopqrstuvwxyz0123456789",
-  "google_ai_model": "gemini-1.5-flash-latest",
+  "google_ai_model": "gemini-2.0-flash",
   "db_files_dir": "/path/to/summarized-rss-feeds/caches/",
   "desired_language": "Korean",
   "verbose": false,
@@ -82,4 +82,8 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 ```
+
+## license
+
+MIT
 
