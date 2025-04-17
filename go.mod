@@ -5,7 +5,7 @@ go 1.24.1
 require (
 	github.com/gorilla/feeds v1.2.0
 	github.com/meinside/rss-feeds-go v0.1.39
-	github.com/meinside/simple-scrapper-go v0.0.12
+	github.com/meinside/simple-scrapper-go v0.0.13
 )
 
 require (
@@ -28,8 +28,8 @@ require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/mattn/go-sqlite3 v1.14.27 // indirect
-	github.com/meinside/gemini-things-go v0.2.16 // indirect
+	github.com/mattn/go-sqlite3 v1.14.28 // indirect
+	github.com/meinside/gemini-things-go v0.2.17 // indirect
 	github.com/meinside/randomized-string-generator-go v0.0.1 // indirect
 	github.com/playwright-community/playwright-go v0.5101.0 // indirect
 	github.com/tailscale/hujson v0.0.0-20250226034555-ec1d1c113d33 // indirect
@@ -43,7 +43,7 @@ require (
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
 	google.golang.org/api v0.229.0 // indirect
-	google.golang.org/genai v1.0.1-0.20250414203924-5b1ba864bd93 // indirect
+	google.golang.org/genai v1.1.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250414145226-207652e42e2e // indirect
 	google.golang.org/grpc v1.71.1 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
