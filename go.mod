@@ -4,7 +4,7 @@ go 1.24.1
 
 require (
 	github.com/gorilla/feeds v1.2.0
-	github.com/meinside/rss-feeds-go v0.1.41
+	github.com/meinside/rss-feeds-go v0.1.42
 	github.com/meinside/simple-scrapper-go v0.0.13
 )
 
@@ -44,9 +44,9 @@ require (
 	golang.org/x/text v0.24.0 // indirect
 	google.golang.org/api v0.230.0 // indirect
 	google.golang.org/genai v1.2.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250422160041-2d3770c4ea7f // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250425173222-7b384671a197 // indirect
 	google.golang.org/grpc v1.72.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gorm.io/driver/sqlite v1.5.7 // indirect
-	gorm.io/gorm v1.25.12 // indirect
+	gorm.io/gorm v1.26.0 // indirect
 )
