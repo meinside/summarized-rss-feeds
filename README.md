@@ -1,6 +1,6 @@
 # summarized-rss-feeds
 
-Fetch RSS feeds, summarize each of them with Google Gemini API, and then serve them as another RSS XML.
+Fetch RSS/Atom/JSON feeds, summarize each of them with Google Gemini API, and then serve them as another RSS XML.
 
 ## build
 
@@ -29,10 +29,11 @@ Create `config.json` file with content:
       "feed_urls": [
         "https://hnrss.org/newest?points=50",
         "https://lobste.rs/rss",
+        "https://www.hackster.io/news.atom",
       ],
       "publish_title": "Summarized RSS Feeds About Technology",
       "publish_link": "https://no-such-domain.com",
-      "publish_description": "Tech RSS Feeds Summarized with Google Gemini 1.5 Flash",
+      "publish_description": "Tech RSS Feeds Summarized with Google Gemini API",
       "publish_author": "rss-feeds-summarizer",
       "publish_email": "no-such-email@no-such-domain.com",
     },
