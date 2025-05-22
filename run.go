@@ -11,7 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gorilla/feeds"
+	"github.com/mmcdole/gofeed"
+
 	rf "github.com/meinside/rss-feeds-go"
 	ssg "github.com/meinside/simple-scrapper-go"
 )
@@ -153,11 +154,11 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed) {
 
 				// generate xml and serve it
 				if bytes, err := client.PublishXML(rssTitle, rssLink, rssDescription, rssAuthor, rssEmail, items); err == nil {
-					w.Header().Set("Content-Type", "application/rss+xml")
+					w.Header().Set("Content-Type", rf.PublishContentType)
 					w.Header().Set("Cache-Control", "max-age=60")
 
 					if _, err := func() (n int, err error) {
-						var s string = string(bytes)
+						s := string(bytes)
 						if sw, ok := io.Writer(w).(io.StringWriter); ok {
 							return sw.WriteString(s)
 						}
@@ -201,7 +202,7 @@ func requestPermitted(r *http.Request, conf config) bool {
 }
 
 // count number of all items of given feeds `fs`
-func numItems(fs []feeds.RssFeed) (num int) {
+func numItems(fs []gofeed.Feed) (num int) {
 	for _, feed := range fs {
 		num += len(feed.Items)
 	}
