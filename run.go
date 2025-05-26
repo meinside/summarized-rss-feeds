@@ -25,6 +25,10 @@ const (
 	defaultPublishEmail       = "noreply@no-such-domain.com"
 )
 
+const (
+	ignoreItemsPublishedBeforeDays uint = 30 // 1 month
+)
+
 // paywalled sites' urls
 var _paywalledSitesURLs = []string{
 	"https://www.nytimes.com/",
@@ -61,7 +65,10 @@ func run(conf config) {
 					client.DeleteOldCachedItems()
 
 					// fetch feeds,
-					if feeds, err := client.FetchFeeds(true); err == nil {
+					if feeds, err := client.FetchFeeds(
+						true,
+						ignoreItemsPublishedBeforeDays,
+					); err == nil {
 						// summarize and cache them,
 						if numItems(feeds) > 0 {
 							// try creating a new scrapper,
