@@ -45,10 +45,26 @@ func run(conf config) {
 		log.Printf("> running with config: %s", rf.Prettify(conf))
 	}
 
+	// api keys
+	apiKeys := []string{}
+	if conf.GoogleAIAPIKey != nil {
+		apiKeys = append(apiKeys, *conf.GoogleAIAPIKey)
+	}
+	if len(conf.GoogleAIAPIKeys) > 0 {
+		apiKeys = append(apiKeys, conf.GoogleAIAPIKeys...)
+	}
+	slices.Sort(apiKeys)
+	apiKeys = slices.Compact(apiKeys)
+
+	// feed configs for serving
 	feedConfs := map[*rf.Client]configRSSFeed{}
 
 	for _, feedConfig := range conf.RSSFeeds {
-		if client, err := rf.NewClientWithDB(conf.GoogleAIAPIKey, feedConfig.FeedURLs, filepath.Join(conf.DBFilesDirectory, feedConfig.CacheFilename)); err == nil {
+		if client, err := rf.NewClientWithDB(
+			apiKeys,
+			feedConfig.FeedURLs,
+			filepath.Join(conf.DBFilesDirectory, feedConfig.CacheFilename),
+		); err == nil {
 			client.SetGoogleAIModel(*conf.GoogleAIModel)
 			client.SetDesiredLanguage(*conf.DesiredLanguage)
 			client.SetVerbose(conf.Verbose)
