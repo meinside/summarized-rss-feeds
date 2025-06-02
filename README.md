@@ -14,7 +14,9 @@ Create `config.json` file with content:
 
 ```json
 {
-  "google_ai_api_key": "AIabcdefghijklmnopqrstuvwxyz0123456789",
+  "google_ai_api_keys": [
+    "AIabcdefghijklmnopqrstuvwxyz0123456789",
+  ],
   "google_ai_model": "gemini-2.0-flash",
   "db_files_dir": "/path/to/summarized-rss-feeds/caches/",
   "desired_language": "Korean",
@@ -51,7 +53,7 @@ This application will poll new feeds from `rss_feeds[].feed_urls` with interval 
 
 Then the contents of the new feeds will be fetched using [playwright-go and/or goquery](https://github.com/meinside/simple-scrapper-go).
 
-Fetched contents will be summarized in `desired_language` with your `google_ai_api_key`, and cached in `rss_feeds[].cache_filename` in `db_files_dir`.
+Fetched contents will be summarized in `desired_language` with your `google_ai_api_keys`, and cached in `rss_feeds[].cache_filename` in `db_files_dir`.
 
 Resulting RSS feeds' RSS XML will be served on: yourserver:`rss_server_port`/`rss_feeds[].serve_path`(eg. `localhost:8080/tech`).
 

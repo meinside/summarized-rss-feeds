@@ -18,11 +18,12 @@ const (
 // config struct
 type config struct {
 	// System
-	GoogleAIAPIKey   string  `json:"google_ai_api_key"`
-	GoogleAIModel    *string `json:"google_ai_model,omitempty"`
-	DBFilesDirectory string  `json:"db_files_dir"`
-	DesiredLanguage  *string `json:"desired_language,omitempty"`
-	Verbose          bool    `json:"verbose,omitempty"`
+	GoogleAIAPIKey   *string  `json:"google_ai_api_key,omitempty"`
+	GoogleAIAPIKeys  []string `json:"google_ai_api_keys,omitempty"`
+	GoogleAIModel    *string  `json:"google_ai_model,omitempty"`
+	DBFilesDirectory string   `json:"db_files_dir"`
+	DesiredLanguage  *string  `json:"desired_language,omitempty"`
+	Verbose          bool     `json:"verbose,omitempty"`
 
 	// RSS
 	RSSFeeds                  []configRSSFeed `json:"rss_feeds"`
