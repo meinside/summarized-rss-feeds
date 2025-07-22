@@ -61,8 +61,8 @@ github.com/meinside/gemini-things-go v0.3.23 h1:O2tX+QJpX7HaVDQboKzfwPPehW96qy5z
 github.com/meinside/gemini-things-go v0.3.23/go.mod h1:K3uErlfSbx+LYhItMgeA1+VNfFAVvmafgXGzH4BsaWc=
 github.com/meinside/randomized-string-generator-go v0.0.1 h1:Pz1rHWe6QY5SKk68/XbYJBtA4Qro4JdxfUtzEMnjWC0=
 github.com/meinside/randomized-string-generator-go v0.0.1/go.mod h1:3Vw7LjCeK+xoR3y91MDZgoe3HgfxZvFZ8q2Mi3k3yx4=
-github.com/meinside/rss-feeds-go v0.2.20 h1:uUKXbplDaYlgIs2xd62+JAr1xolpkOHDgXuE01zdFzI=
-github.com/meinside/rss-feeds-go v0.2.20/go.mod h1:3dEkKp41wir/V4/klIqid01uqW5LiUqo0IvI+KSiFFg=
+github.com/meinside/rss-feeds-go v0.2.21 h1:S5msit11M/dV1mAxSoJiLWvRXYsm96MemD3Jgql2J/E=
+github.com/meinside/rss-feeds-go v0.2.21/go.mod h1:QmSInSF+sUGHrMOHqSyb2ULFf9metySv7jf1MDXN01I=
 github.com/meinside/simple-scrapper-go v0.0.14 h1:/dS2iRiDV6930IvIlUNBCP21D0z6tolcRwxukTTxwnA=
 github.com/meinside/simple-scrapper-go v0.0.14/go.mod h1:lqM68CVTXMsDP35s1jv2X55GGV7nBgZ+l+Al6c5hus0=
 github.com/mitchellh/go-ps v1.0.0 h1:i6ampVEEF4wQFF+bkYfwYgY+F/uYJDktmvLPf7qIgjc=
@@ -185,8 +185,8 @@ golang.org/x/tools v0.34.0/go.mod h1:pAP9OwEaY1CAW3HOmg3hLZC5Z0CCmzjAF2UQMSqNARg
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 google.golang.org/genai v1.16.0 h1:MkPOZt7MFGeOL2lTpox4GyLfSKIISbxzjuQ8b/G/qBk=
 google.golang.org/genai v1.16.0/go.mod h1:QPj5NGJw+3wEOHg+PrsWwJKvG6UC84ex5FR7qAYsN/M=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20250715232539-7130f93afb79 h1:1ZwqphdOdWYXsUHgMpU/101nCtf/kSp9hOrcvFsnl10=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20250715232539-7130f93afb79/go.mod h1:qQ0YXyHHx3XkvlzUtpXDkS29lDSafHMZBAZDc03LQ3A=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20250721164621-a45f3dfb1074 h1:qJW29YvkiJmXOYMu5Tf8lyrTp3dOS+K4z6IixtLaCf8=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20250721164621-a45f3dfb1074/go.mod h1:qQ0YXyHHx3XkvlzUtpXDkS29lDSafHMZBAZDc03LQ3A=
 google.golang.org/grpc v1.73.0 h1:VIWSmpI2MegBtTuFt5/JWy2oXxtjJ/e89Z70ImfD2ok=
 google.golang.org/grpc v1.73.0/go.mod h1:50sbHOUqWoCQGI8V2HQLJM0B+LMlIUjNSZmow7EVBQc=
 google.golang.org/protobuf v1.36.6 h1:z1NpPI8ku2WgiWnf+t9wTPsn6eP1L7ksHUlkfLvd9xY=
