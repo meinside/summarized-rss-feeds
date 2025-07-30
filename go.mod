@@ -3,7 +3,7 @@ module summarized-rss-feeds
 go 1.24.1
 
 require (
-	github.com/meinside/rss-feeds-go v0.2.21
+	github.com/meinside/rss-feeds-go v0.2.22
 	github.com/meinside/simple-scrapper-go v0.0.14
 	github.com/mmcdole/gofeed v1.3.0
 )
@@ -30,8 +30,8 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/mattn/go-sqlite3 v1.14.28 // indirect
-	github.com/meinside/gemini-things-go v0.3.23 // indirect
+	github.com/mattn/go-sqlite3 v1.14.29 // indirect
+	github.com/meinside/gemini-things-go v0.3.24 // indirect
 	github.com/meinside/randomized-string-generator-go v0.0.1 // indirect
 	github.com/mmcdole/goxpp v1.1.1 // indirect
 	github.com/modelcontextprotocol/go-sdk v0.2.0 // indirect
@@ -49,10 +49,10 @@ require (
 	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
-	google.golang.org/genai v1.16.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250721164621-a45f3dfb1074 // indirect
-	google.golang.org/grpc v1.73.0 // indirect
+	google.golang.org/genai v1.17.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250728155136-f173205681a0 // indirect
+	google.golang.org/grpc v1.74.2 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gorm.io/driver/sqlite v1.6.0 // indirect
-	gorm.io/gorm v1.30.0 // indirect
+	gorm.io/gorm v1.30.1 // indirect
 )
