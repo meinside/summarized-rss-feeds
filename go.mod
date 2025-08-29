@@ -3,7 +3,7 @@ module summarized-rss-feeds
 go 1.25.0
 
 require (
-	github.com/meinside/rss-feeds-go v0.2.26
+	github.com/meinside/rss-feeds-go v0.2.27
 	github.com/meinside/simple-scrapper-go v0.0.14
 	github.com/mmcdole/gofeed v1.3.0
 )
@@ -55,5 +55,5 @@ require (
 	google.golang.org/grpc v1.75.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
 	gorm.io/driver/sqlite v1.6.0 // indirect
-	gorm.io/gorm v1.30.1 // indirect
+	gorm.io/gorm v1.30.2 // indirect
 )
