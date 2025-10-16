@@ -3,8 +3,8 @@ module summarized-rss-feeds
 go 1.25.0
 
 require (
-	github.com/meinside/rss-feeds-go v0.2.33
-	github.com/meinside/simple-scrapper-go v0.0.14
+	github.com/meinside/rss-feeds-go v0.2.34
+	github.com/meinside/simple-scrapper-go v0.0.15
 	github.com/mmcdole/gofeed v1.3.0
 )
 
