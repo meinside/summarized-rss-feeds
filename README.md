@@ -40,7 +40,8 @@ Create `config.json` file with content:
       "publish_email": "no-such-email@no-such-domain.com",
     },
   ],
-  "fetch_feeds_interval_minutes": 5,
+  "fetch_feeds_interval_seconds": 300,
+  "fetch_feeds_timeout_seconds": 60,
   "permitted_user_agents": [
     "Feedly", // feedly crawler bot's user agent
   ],
@@ -49,7 +50,7 @@ Create `config.json` file with content:
 }
 ```
 
-This application will poll new feeds from `rss_feeds[].feed_urls` with interval of `fetch_feeds_interval_minutes`.
+This application will poll new feeds from `rss_feeds[].feed_urls` with interval of `fetch_feeds_interval_seconds`.
 
 Then the contents of the new feeds will be fetched using [playwright-go and/or goquery](https://github.com/meinside/simple-scrapper-go).
 
