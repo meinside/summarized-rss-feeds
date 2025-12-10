@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -59,6 +60,9 @@ func run(conf config) {
 	// feed configs for serving
 	feedConfs := map[*rf.Client]configRSSFeed{}
 
+	// background context
+	ctxBg := context.Background()
+
 	for _, feedConfig := range conf.RSSFeeds {
 		if client, err := rf.NewClientWithDB(
 			apiKeys,
@@ -70,7 +74,11 @@ func run(conf config) {
 			client.SetVerbose(conf.Verbose)
 
 			if conf.Verbose {
-				log.Printf("> periodically processing feeds from urls: %s", strings.Join(feedConfig.FeedURLs, ", "))
+				log.Printf(
+					"> periodically(interval: %ds) processing feeds from urls: %s",
+					conf.FetchFeedsIntervalSeconds,
+					strings.Join(feedConfig.FeedURLs, ", "),
+				)
 			}
 
 			// run periodically:
@@ -80,8 +88,13 @@ func run(conf config) {
 					// delete old caches
 					client.DeleteOldCachedItems()
 
+					// context with timeout (fetch)
+					ctx, cancel := context.WithTimeout(ctxBg, time.Duration(conf.FetchFeedsTimeoutSeconds)*time.Second)
+					defer cancel() //nolint:SA9001
+
 					// fetch feeds,
 					if feeds, err := client.FetchFeeds(
+						ctx,
 						true,
 						ignoreItemsPublishedBeforeDays,
 					); err == nil {
