@@ -69,7 +69,9 @@ func run(conf config) {
 			feedConfig.FeedURLs,
 			filepath.Join(conf.DBFilesDirectory, feedConfig.CacheFilename),
 		); err == nil {
-			client.SetGoogleAIModel(*conf.GoogleAIModel)
+			if len(conf.GoogleAIModels) > 0 {
+				client.SetGoogleAIModels(conf.GoogleAIModels)
+			}
 			client.SetDesiredLanguage(*conf.DesiredLanguage)
 			client.SetVerbose(conf.Verbose)
 
