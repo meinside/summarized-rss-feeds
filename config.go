@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	defaultGoogleAIModel   = `gemini-2.5-flash`
+	defaultGoogleAIModel   = `gemini-3-flash-preview`
 	defaultDesiredLanguage = `English`
 
 	defaultFetchFeedsIntervalSeconds = 60 * 3 // = 3 minutes
