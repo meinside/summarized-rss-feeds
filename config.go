@@ -22,7 +22,7 @@ type config struct {
 	// System
 	GoogleAIAPIKey   *string  `json:"google_ai_api_key,omitempty"`
 	GoogleAIAPIKeys  []string `json:"google_ai_api_keys,omitempty"`
-	GoogleAIModel    *string  `json:"google_ai_model,omitempty"`
+	GoogleAIModels   []string `json:"google_ai_models,omitempty"`
 	DBFilesDirectory string   `json:"db_files_dir"`
 	DesiredLanguage  *string  `json:"desired_language,omitempty"`
 	Verbose          bool     `json:"verbose,omitempty"`
@@ -60,8 +60,8 @@ func readConfig(filepath string) (conf config, err error) {
 		if bytes, err = rf.StandardizeJSON(bytes); err == nil {
 			if err = json.Unmarshal(bytes, &conf); err == nil {
 				// set default values
-				if conf.GoogleAIModel == nil {
-					conf.GoogleAIModel = ptr(defaultGoogleAIModel)
+				if len(conf.GoogleAIModels) <= 0 {
+					conf.GoogleAIModels = []string{defaultGoogleAIModel}
 				}
 				if conf.DesiredLanguage == nil {
 					conf.DesiredLanguage = ptr(defaultDesiredLanguage)

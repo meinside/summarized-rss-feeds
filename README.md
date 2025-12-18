@@ -17,7 +17,9 @@ Create `config.json` file with content:
   "google_ai_api_keys": [
     "AIabcdefghijklmnopqrstuvwxyz0123456789",
   ],
-  "google_ai_model": "gemini-2.0-flash",
+  "google_ai_models": [
+    "gemini-2.5-flash",
+  ],
   "db_files_dir": "/path/to/summarized-rss-feeds/caches/",
   "desired_language": "Korean",
   "verbose": false,

@@ -2,7 +2,9 @@
   "google_ai_api_keys": [
     "AIabcdefghijklmnopqrstuvwxyz0123456789"
   ],
-  "google_ai_model": "gemini-3-flash-preview",
+  "google_ai_models": [
+    "gemini-3-flash-preview"
+  ],
   "db_files_dir": "/path/to/summarized-rss-feeds/caches/",
   "desired_language": "Korean",
   "verbose": false,
