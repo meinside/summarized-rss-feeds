@@ -7,12 +7,6 @@ import (
 	"os"
 )
 
-// return the pointer of given value `v`
-func ptr[T any](v T) *T {
-	val := v
-	return &val
-}
-
 // print help message
 func printHelp(cmd string) {
 	log.Printf(`> Usage:
