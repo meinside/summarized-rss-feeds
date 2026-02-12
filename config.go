@@ -64,7 +64,7 @@ func readConfig(filepath string) (conf config, err error) {
 					conf.GoogleAIModels = []string{defaultGoogleAIModel}
 				}
 				if conf.DesiredLanguage == nil {
-					conf.DesiredLanguage = ptr(defaultDesiredLanguage)
+					conf.DesiredLanguage = new(defaultDesiredLanguage)
 				}
 				if conf.FetchFeedsIntervalSeconds <= 0 {
 					conf.FetchFeedsIntervalSeconds = defaultFetchFeedsIntervalSeconds
