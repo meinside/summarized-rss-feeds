@@ -3,13 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"path"
 	"path/filepath"
 	"slices"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/mmcdole/gofeed"
@@ -28,6 +30,10 @@ const (
 
 const (
 	ignoreItemsPublishedBeforeDays uint = 30 // 1 month
+
+	httpReadTimeout  = 10 * time.Second
+	httpWriteTimeout = 30 * time.Second
+	httpIdleTimeout  = 60 * time.Second
 )
 
 // paywalled sites' urls
@@ -60,8 +66,9 @@ func run(conf config) {
 	// feed configs for serving
 	feedConfs := map[*rf.Client]configRSSFeed{}
 
-	// background context
-	ctxBg := context.Background()
+	// context for controlling goroutines
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	for _, feedConfig := range conf.RSSFeeds {
 		if client, err := rf.NewClientWithDB(
@@ -83,60 +90,19 @@ func run(conf config) {
 				)
 			}
 
-			// run periodically:
+			// run periodically (fetch immediately on start, then on interval):
 			go func(client *rf.Client) {
+				processFeedTick(ctx, client, conf)
+
 				ticker := time.NewTicker(time.Duration(conf.FetchFeedsIntervalSeconds) * time.Second)
-				for range ticker.C {
-					// delete old caches
-					client.DeleteOldCachedItems()
+				defer ticker.Stop()
 
-					// context with timeout (fetch)
-					ctx, cancel := context.WithTimeout(ctxBg, time.Duration(conf.FetchFeedsTimeoutSeconds)*time.Second)
-					defer cancel() //nolint:SA9001
-
-					// fetch feeds,
-					if feeds, err := client.FetchFeeds(
-						ctx,
-						true,
-						ignoreItemsPublishedBeforeDays,
-					); err == nil {
-						// summarize and cache them,
-						if numItems(feeds) > 0 {
-							// try creating a new scrapper,
-							scrapper := newScrapper()
-							if scrapper != nil {
-								// scrap + summarize, and cache feeds
-								if err := client.SummarizeAndCacheFeeds(feeds, scrapper); err != nil {
-									log.Printf("# summary with scrapper failed: %s", err)
-								}
-
-								// close the scrapper,
-								if err := scrapper.Close(); err != nil {
-									log.Printf("# failed to close scrapper: %s", err)
-								}
-							} else {
-								// or just fetch + summarize, and cache feeds
-								if err := client.SummarizeAndCacheFeeds(feeds); err != nil {
-									log.Printf("# summary failed: %s", err)
-								}
-							}
-						}
-
-						// fetch cached (summarized) items,
-						items := client.ListCachedItems(false)
-
-						if conf.Verbose {
-							log.Printf(">>> fetched %d new item(s).", len(items))
-						}
-
-						// and mark them as read
-						client.MarkCachedItemsAsRead(items)
-
-						if conf.Verbose {
-							log.Printf(">>> marked %d item(s) as read.", len(items))
-						}
-					} else {
-						log.Printf("# failed to fetch feeds: %s", err)
+				for {
+					select {
+					case <-ctx.Done():
+						return
+					case <-ticker.C:
+						processFeedTick(ctx, client, conf)
 					}
 				}
 			}(client)
@@ -147,15 +113,79 @@ func run(conf config) {
 		}
 	}
 
+	if len(feedConfs) == 0 {
+		log.Printf("# no feed clients were created, exiting")
+		return
+	}
+
 	// serve RSS feeds
 	if conf.Verbose {
 		log.Printf("> serving with config: %s", rf.Prettify(conf))
 	}
-	serve(conf, feedConfs)
+	serve(conf, feedConfs, cancel)
+}
+
+// processFeedTick handles a single tick of the feed processing loop
+func processFeedTick(parent context.Context, client *rf.Client, conf config) {
+	// delete old caches
+	client.DeleteOldCachedItems()
+
+	// context with timeout (fetch)
+	ctx, cancel := context.WithTimeout(parent, time.Duration(conf.FetchFeedsTimeoutSeconds)*time.Second)
+	defer cancel()
+
+	// fetch feeds,
+	feeds, err := client.FetchFeeds(
+		ctx,
+		true,
+		ignoreItemsPublishedBeforeDays,
+	)
+	if err != nil {
+		log.Printf("# failed to fetch feeds: %s", err)
+		return
+	}
+
+	// summarize and cache them,
+	if numItems(feeds) > 0 {
+		// try creating a new scrapper,
+		scrapper := newScrapper()
+		if scrapper != nil {
+			// scrap + summarize, and cache feeds
+			if err := client.SummarizeAndCacheFeeds(feeds, scrapper); err != nil {
+				log.Printf("# summary with scrapper failed: %s", err)
+			}
+
+			// close the scrapper,
+			if err := scrapper.Close(); err != nil {
+				log.Printf("# failed to close scrapper: %s", err)
+			}
+		} else {
+			// or just fetch + summarize, and cache feeds
+			if err := client.SummarizeAndCacheFeeds(feeds); err != nil {
+				log.Printf("# summary failed: %s", err)
+			}
+		}
+	}
+
+	// fetch cached (summarized) items,
+	items := client.ListCachedItems(false)
+
+	if conf.Verbose {
+		log.Printf(">>> fetched %d new item(s).", len(items))
+	}
+
+	// and mark them as read
+	client.MarkCachedItemsAsRead(items)
+
+	if conf.Verbose {
+		log.Printf(">>> marked %d item(s) as read.", len(items))
+	}
 }
 
 // serve RSS xml
-func serve(conf config, feedConfs map[*rf.Client]configRSSFeed) {
+func serve(conf config, feedConfs map[*rf.Client]configRSSFeed, cancelFunc context.CancelFunc) {
+	mux := http.NewServeMux()
+
 	// set http handlers
 	for client, feedConf := range feedConfs {
 		// get values for publish
@@ -180,7 +210,7 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed) {
 			rssEmail = *feedConf.PublishEmail
 		}
 
-		http.HandleFunc(path.Join("/", feedConf.ServePath), func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc(path.Join("/", feedConf.ServePath), func(w http.ResponseWriter, r *http.Request) {
 			if requestPermitted(r, conf) {
 				// fetch cached items,
 				items := client.ListCachedItems(true)
@@ -195,17 +225,12 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed) {
 					w.Header().Set("Content-Type", rf.PublishContentType)
 					w.Header().Set("Cache-Control", "max-age=60")
 
-					if _, err := func() (n int, err error) {
-						s := string(bytes)
-						if sw, ok := io.Writer(w).(io.StringWriter); ok {
-							return sw.WriteString(s)
-						}
-						return io.Writer(w).Write([]byte(s))
-					}(); err != nil {
+					if _, err := w.Write(bytes); err != nil {
 						log.Printf("# failed to write data: %s", err)
 					}
 				} else {
 					log.Printf("# failed to serve RSS feeds: %s", err)
+					w.WriteHeader(http.StatusInternalServerError)
 				}
 			} else {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -213,9 +238,36 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed) {
 		})
 	}
 
+	server := &http.Server{
+		Addr:         fmt.Sprintf(":%d", conf.RSSServerPort),
+		Handler:      mux,
+		ReadTimeout:  httpReadTimeout,
+		WriteTimeout: httpWriteTimeout,
+		IdleTimeout:  httpIdleTimeout,
+	}
+
+	// graceful shutdown on signals
+	go func() {
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+		sig := <-sigCh
+
+		log.Printf("> received signal %s, shutting down...", sig)
+
+		// cancel background goroutines
+		cancelFunc()
+
+		// gracefully shutdown the HTTP server
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer shutdownCancel()
+
+		if err := server.Shutdown(shutdownCtx); err != nil {
+			log.Printf("# failed to shutdown server gracefully: %s", err)
+		}
+	}()
+
 	// listen and serve
-	err := http.ListenAndServe(fmt.Sprintf(":%d", conf.RSSServerPort), nil)
-	if err != nil {
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Printf("# failed to start server: %s", err)
 	}
 }
