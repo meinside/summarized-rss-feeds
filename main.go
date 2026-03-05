@@ -25,7 +25,7 @@ func main() {
 		if conf, err := readConfig(configFilepath); err == nil {
 			run(conf)
 
-			os.Exit(0)
+			return
 		} else {
 			log.Printf("> failed to read config: %s", err)
 		}

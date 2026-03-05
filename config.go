@@ -4,6 +4,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	rf "github.com/meinside/rss-feeds-go"
@@ -59,6 +60,20 @@ func readConfig(filepath string) (conf config, err error) {
 	if bytes, err = os.ReadFile(filepath); err == nil {
 		if bytes, err = rf.StandardizeJSON(bytes); err == nil {
 			if err = json.Unmarshal(bytes, &conf); err == nil {
+				// validate required fields
+				if conf.GoogleAIAPIKey == nil && len(conf.GoogleAIAPIKeys) == 0 {
+					return conf, fmt.Errorf("at least one of 'google_ai_api_key' or 'google_ai_api_keys' is required")
+				}
+				if conf.DBFilesDirectory == "" {
+					return conf, fmt.Errorf("'db_files_dir' is required")
+				}
+				if len(conf.RSSFeeds) == 0 {
+					return conf, fmt.Errorf("'rss_feeds' must contain at least one entry")
+				}
+				if conf.RSSServerPort <= 0 {
+					return conf, fmt.Errorf("'rss_server_port' must be a positive number")
+				}
+
 				// set default values
 				if len(conf.GoogleAIModels) <= 0 {
 					conf.GoogleAIModels = []string{defaultGoogleAIModel}
