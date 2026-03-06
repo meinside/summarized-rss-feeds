@@ -38,12 +38,12 @@ const (
 
 // paywalled sites' urls
 var _paywalledSitesURLs = []string{
-	"https://www.nytimes.com/",
-	"https://www.wsj.com/",
-	"https://www.washingtonpost.com/",
-	"https://www.economist.com/",
-	"https://www.ft.com/",
-	"https://www.theguardian.com/",
+	`https://www.nytimes.com/`,
+	`https://www.wsj.com/`,
+	`https://www.washingtonpost.com/`,
+	`https://www.economist.com/`,
+	`https://www.ft.com/`,
+	`https://www.theguardian.com/`,
 }
 
 // run with config
@@ -128,7 +128,9 @@ func run(conf config) {
 // processFeedTick handles a single tick of the feed processing loop
 func processFeedTick(parent context.Context, client *rf.Client, conf config) {
 	// delete old caches
-	client.DeleteOldCachedItems()
+	if err := client.DeleteOldCachedItems(); err != nil {
+		log.Printf("# failed to delete old cached items: %s", err)
+	}
 
 	// context with timeout (fetch)
 	ctx, cancel := context.WithTimeout(parent, time.Duration(conf.FetchFeedsTimeoutSeconds)*time.Second)
@@ -151,7 +153,7 @@ func processFeedTick(parent context.Context, client *rf.Client, conf config) {
 		scrapper := newScrapper()
 		if scrapper != nil {
 			// scrap + summarize, and cache feeds
-			if err := client.SummarizeAndCacheFeeds(feeds, scrapper); err != nil {
+			if err := client.SummarizeAndCacheFeeds(parent, feeds, scrapper); err != nil {
 				log.Printf("# summary with scrapper failed: %s", err)
 			}
 
@@ -161,7 +163,7 @@ func processFeedTick(parent context.Context, client *rf.Client, conf config) {
 			}
 		} else {
 			// or just fetch + summarize, and cache feeds
-			if err := client.SummarizeAndCacheFeeds(feeds); err != nil {
+			if err := client.SummarizeAndCacheFeeds(parent, feeds); err != nil {
 				log.Printf("# summary failed: %s", err)
 			}
 		}
@@ -175,7 +177,9 @@ func processFeedTick(parent context.Context, client *rf.Client, conf config) {
 	}
 
 	// and mark them as read
-	client.MarkCachedItemsAsRead(items)
+	if err := client.MarkCachedItemsAsRead(items); err != nil {
+		log.Printf("# failed to mark items as read: %s", err)
+	}
 
 	if conf.Verbose {
 		log.Printf(">>> marked %d item(s) as read.", len(items))

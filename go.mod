@@ -3,7 +3,7 @@ module summarized-rss-feeds
 go 1.26.0
 
 require (
-	github.com/meinside/rss-feeds-go v0.3.17
+	github.com/meinside/rss-feeds-go v0.3.18
 	github.com/meinside/simple-scrapper-go v0.0.16
 	github.com/mmcdole/gofeed v1.3.0
 )
@@ -38,7 +38,7 @@ require (
 	github.com/google/jsonschema-go v0.4.2 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.13 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.14 // indirect
 	github.com/googleapis/gax-go/v2 v2.17.0 // indirect
 	github.com/gorilla/feeds v1.2.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
@@ -46,7 +46,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/mattn/go-sqlite3 v1.14.34 // indirect
-	github.com/meinside/gemini-things-go v0.5.22 // indirect
+	github.com/meinside/gemini-things-go v0.5.23 // indirect
 	github.com/meinside/randomized-string-generator-go v0.0.1 // indirect
 	github.com/mmcdole/goxpp v1.1.1 // indirect
 	github.com/modelcontextprotocol/go-sdk v1.4.0 // indirect
