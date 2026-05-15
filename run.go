@@ -226,23 +226,23 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed, cancelFunc conte
 					items = dropItemsWithFailedSummaries(items)
 				}
 
+				etag := itemsETag(items)
+				lastModified := latestPublishDate(items)
+
+				w.Header().Set("Content-Type", rf.PublishContentType)
+				w.Header().Set("Cache-Control", "max-age=60")
+				w.Header().Set("ETag", etag)
+				if !lastModified.IsZero() {
+					w.Header().Set("Last-Modified", lastModified.UTC().Format(http.TimeFormat))
+				}
+
+				if notModified(r, etag, lastModified) {
+					w.WriteHeader(http.StatusNotModified)
+					return
+				}
+
 				// generate xml and serve it
 				if bytes, err := client.PublishXML(rssTitle, rssLink, rssDescription, rssAuthor, rssEmail, items); err == nil {
-					etag := `W/"` + hex.EncodeToString(sha256Sum(bytes)) + `"`
-					lastModified := latestPublishDate(items)
-
-					w.Header().Set("Content-Type", rf.PublishContentType)
-					w.Header().Set("Cache-Control", "max-age=60")
-					w.Header().Set("ETag", etag)
-					if !lastModified.IsZero() {
-						w.Header().Set("Last-Modified", lastModified.UTC().Format(http.TimeFormat))
-					}
-
-					if notModified(r, etag, lastModified) {
-						w.WriteHeader(http.StatusNotModified)
-						return
-					}
-
 					if _, err := w.Write(bytes); err != nil {
 						log.Printf("# failed to write data: %s", err)
 					}
@@ -361,9 +361,15 @@ func dropItemsWithFailedSummaries(items []rf.CachedItem) []rf.CachedItem {
 	})
 }
 
-func sha256Sum(b []byte) []byte {
-	sum := sha256.Sum256(b)
-	return sum[:]
+// itemsETag returns a weak ETag derived from the stable identity of items
+// (GUID + UpdatedAt), so that incidental per-request changes in the
+// rendered XML (e.g., channel pubDate set to time.Now()) do not change it.
+func itemsETag(items []rf.CachedItem) string {
+	h := sha256.New()
+	for _, it := range items {
+		fmt.Fprintf(h, "%s\x00%d\x00", it.GUID, it.UpdatedAt.UnixNano())
+	}
+	return `W/"` + hex.EncodeToString(h.Sum(nil)) + `"`
 }
 
 // latestPublishDate returns the newest parsable PublishDate among items.
