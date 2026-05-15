@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
@@ -226,8 +228,20 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed, cancelFunc conte
 
 				// generate xml and serve it
 				if bytes, err := client.PublishXML(rssTitle, rssLink, rssDescription, rssAuthor, rssEmail, items); err == nil {
+					etag := `W/"` + hex.EncodeToString(sha256Sum(bytes)) + `"`
+					lastModified := latestPublishDate(items)
+
 					w.Header().Set("Content-Type", rf.PublishContentType)
 					w.Header().Set("Cache-Control", "max-age=60")
+					w.Header().Set("ETag", etag)
+					if !lastModified.IsZero() {
+						w.Header().Set("Last-Modified", lastModified.UTC().Format(http.TimeFormat))
+					}
+
+					if notModified(r, etag, lastModified) {
+						w.WriteHeader(http.StatusNotModified)
+						return
+					}
 
 					if _, err := w.Write(bytes); err != nil {
 						log.Printf("# failed to write data: %s", err)
@@ -345,4 +359,46 @@ func dropItemsWithFailedSummaries(items []rf.CachedItem) []rf.CachedItem {
 	return slices.DeleteFunc(items, func(item rf.CachedItem) bool {
 		return strings.Contains(item.Summary, rf.ErrorPrefixSummaryFailedWithError)
 	})
+}
+
+func sha256Sum(b []byte) []byte {
+	sum := sha256.Sum256(b)
+	return sum[:]
+}
+
+// latestPublishDate returns the newest parsable PublishDate among items.
+func latestPublishDate(items []rf.CachedItem) time.Time {
+	var latest time.Time
+	for _, item := range items {
+		if item.PublishDate == "" {
+			continue
+		}
+		t, err := time.Parse(time.RFC3339, item.PublishDate)
+		if err != nil {
+			continue
+		}
+		if t.After(latest) {
+			latest = t
+		}
+	}
+	return latest
+}
+
+// notModified reports whether the request can be answered with 304.
+// Per RFC 7232, If-None-Match takes precedence over If-Modified-Since.
+func notModified(r *http.Request, etag string, lastModified time.Time) bool {
+	if inm := r.Header.Get("If-None-Match"); inm != "" {
+		for tag := range strings.SplitSeq(inm, ",") {
+			if strings.TrimSpace(tag) == etag {
+				return true
+			}
+		}
+		return false
+	}
+	if ims := r.Header.Get("If-Modified-Since"); ims != "" && !lastModified.IsZero() {
+		if t, err := http.ParseTime(ims); err == nil {
+			return !lastModified.Truncate(time.Second).After(t)
+		}
+	}
+	return false
 }
