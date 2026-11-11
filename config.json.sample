@@ -5,11 +5,13 @@
   "google_ai_models": [
     "gemini-3.6-flash"
   ],
-  // EXAONE API keys and models
-  // (at least one of `google_ai_api_keys` or `exaone_api_keys` is required)
-  "exaone_api_keys": [
-    "sk-abcdefghijklmnopqrstuvwyz012345679"
-  ],
+  // (optional) EXAONE account for issuing and renewing an api key automatically, and models
+  // (at least one of `google_ai_api_keys` or `exaone_account` is required)
+  //"exaone_account": {
+  //  "email": "your-exaone-id@example.com",
+  //  "password": "your-exaone-password",
+  //  "key_file": "/path/to/exaone-key.json" // (optional) default: `exaone-key.json` in `db_files_dir`
+  //},
   //"exaone_models": [
   //  "k-exaone_v2.5"
   //],

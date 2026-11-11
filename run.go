@@ -65,16 +65,23 @@ func run(conf config) {
 	slices.Sort(apiKeys)
 	apiKeys = slices.Compact(apiKeys)
 
-	exaoneAPIKeys := slices.Clone(conf.ExaoneAPIKeys)
-	slices.Sort(exaoneAPIKeys)
-	exaoneAPIKeys = slices.Compact(exaoneAPIKeys)
-
-	// feed configs for serving
-	feedConfs := map[*rf.Client]configRSSFeed{}
-
 	// context for controlling goroutines
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	// NOTE: one authorizer is shared by all clients, as the account has only
+	// one key and each renewal replaces it
+	var exaoneHTTPClient *http.Client
+	if conf.ExaoneAccount != nil {
+		var err error
+		if exaoneHTTPClient, err = newExaoneHTTPClient(ctx, *conf.ExaoneAccount); err != nil {
+			log.Printf("# %s, exiting", err)
+			return
+		}
+	}
+
+	// feed configs for serving
+	feedConfs := map[*rf.Client]configRSSFeed{}
 
 	for _, feedConfig := range conf.RSSFeeds {
 		if client, err := rf.NewClientWithDB(
@@ -85,8 +92,9 @@ func run(conf config) {
 			if len(conf.GoogleAIModels) > 0 {
 				client.SetGoogleAIModels(conf.GoogleAIModels)
 			}
-			if len(exaoneAPIKeys) > 0 {
-				client.SetExaoneAPIKeys(exaoneAPIKeys)
+			if exaoneHTTPClient != nil {
+				client.SetExaoneAPIKeys([]string{exaonePlaceholderAPIKey})
+				client.SetExaoneHTTPClient(exaoneHTTPClient)
 				if len(conf.ExaoneModels) > 0 {
 					client.SetExaoneModels(conf.ExaoneModels)
 				}

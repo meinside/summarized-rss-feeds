@@ -165,10 +165,10 @@ func TestReadConfig_InvalidPort(t *testing.T) {
 	}
 }
 
-func TestReadConfig_ExaoneAPIKeys(t *testing.T) {
+func TestReadConfig_ExaoneModels(t *testing.T) {
 	content := `{
 		"google_ai_api_keys": ["key1"],
-		"exaone_api_keys": ["exaone-key1", "exaone-key2"],
+		"exaone_account": {"email": "user@example.com", "password": "the-password"},
 		"exaone_models": ["exaone-model"],
 		"db_files_dir": "/tmp",
 		"rss_feeds": [{"name":"t","cache_filename":"t.db","serve_path":"/t","feed_urls":["https://example.com/rss"]}],
@@ -181,18 +181,15 @@ func TestReadConfig_ExaoneAPIKeys(t *testing.T) {
 		t.Fatalf("readConfig() error: %s", err)
 	}
 
-	if len(conf.ExaoneAPIKeys) != 2 || conf.ExaoneAPIKeys[0] != "exaone-key1" || conf.ExaoneAPIKeys[1] != "exaone-key2" {
-		t.Errorf("expected 2 exaone api keys, got %v", conf.ExaoneAPIKeys)
-	}
 	if len(conf.ExaoneModels) != 1 || conf.ExaoneModels[0] != "exaone-model" {
 		t.Errorf("expected exaone model, got %v", conf.ExaoneModels)
 	}
 }
 
-func TestReadConfig_ExaoneAPIKeysOnly(t *testing.T) {
+func TestReadConfig_ExaoneAccount(t *testing.T) {
 	content := `{
-		"exaone_api_keys": ["exaone-key1"],
-		"db_files_dir": "/tmp",
+		"exaone_account": {"email": "user@example.com", "password": "the-password"},
+		"db_files_dir": "/tmp/caches",
 		"rss_feeds": [{"name":"t","cache_filename":"t.db","serve_path":"/t","feed_urls":["https://example.com/rss"]}],
 		"rss_server_port": 8080
 	}`
@@ -202,11 +199,63 @@ func TestReadConfig_ExaoneAPIKeysOnly(t *testing.T) {
 	if err != nil {
 		t.Fatalf("readConfig() error: %s", err)
 	}
+	// without google ai api keys
 	if conf.GoogleAIAPIKey != nil || len(conf.GoogleAIAPIKeys) != 0 {
 		t.Errorf("expected no google ai api keys, got %v, %v", conf.GoogleAIAPIKey, conf.GoogleAIAPIKeys)
 	}
-	if len(conf.ExaoneAPIKeys) != 1 || conf.ExaoneAPIKeys[0] != "exaone-key1" {
-		t.Errorf("expected 1 exaone api key, got %v", conf.ExaoneAPIKeys)
+	if conf.ExaoneAccount == nil || conf.ExaoneAccount.Email != "user@example.com" || conf.ExaoneAccount.Password != "the-password" {
+		t.Fatalf("unexpected exaone account: %+v", conf.ExaoneAccount)
+	}
+	if want := "/tmp/caches/" + defaultExaoneKeyFilename; conf.ExaoneAccount.KeyFile != want {
+		t.Errorf("expected default key file %s, got %s", want, conf.ExaoneAccount.KeyFile)
+	}
+}
+
+func TestReadConfig_ExaoneAccountKeyFile(t *testing.T) {
+	content := `{
+		"exaone_account": {"email": "user@example.com", "password": "the-password", "key_file": "/somewhere/key.json"},
+		"db_files_dir": "/tmp/caches",
+		"rss_feeds": [{"name":"t","cache_filename":"t.db","serve_path":"/t","feed_urls":["https://example.com/rss"]}],
+		"rss_server_port": 8080
+	}`
+	path := writeTestConfig(t, content)
+
+	conf, err := readConfig(path)
+	if err != nil {
+		t.Fatalf("readConfig() error: %s", err)
+	}
+	if conf.ExaoneAccount.KeyFile != "/somewhere/key.json" {
+		t.Errorf("expected given key file, got %s", conf.ExaoneAccount.KeyFile)
+	}
+}
+
+func TestReadConfig_ExaoneAccountInvalid(t *testing.T) {
+	for name, tc := range map[string]struct {
+		fields  string
+		wantErr string
+	}{
+		"without password": {
+			fields:  `"exaone_account": {"email": "user@example.com"},`,
+			wantErr: "'email' and 'password'",
+		},
+		"without email": {
+			fields:  `"exaone_account": {"password": "the-password"},`,
+			wantErr: "'email' and 'password'",
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			content := `{
+				` + tc.fields + `
+				"db_files_dir": "/tmp",
+				"rss_feeds": [{"name":"t","cache_filename":"t.db","serve_path":"/t","feed_urls":["https://example.com/rss"]}],
+				"rss_server_port": 8080
+			}`
+			path := writeTestConfig(t, content)
+
+			if _, err := readConfig(path); err == nil || !strings.Contains(err.Error(), tc.wantErr) {
+				t.Errorf("expected error containing %q, got %v", tc.wantErr, err)
+			}
+		})
 	}
 }
 
@@ -215,17 +264,17 @@ func TestConfigRedacted(t *testing.T) {
 	conf := config{
 		GoogleAIAPIKey:  &googleKey,
 		GoogleAIAPIKeys: []string{"google-key-abcdefghijklmn", "short"},
-		ExaoneAPIKeys:   []string{"exaone-key-opqrstuvwxyz"},
+		ExaoneAccount:   &configExaoneAccount{Email: "user@example.com", Password: "the-exaone-password"},
 	}
 
 	logged := rf.Prettify(conf.redacted())
 
-	for _, key := range []string{googleKey, "google-key-abcdefghijklmn", "short", "exaone-key-opqrstuvwxyz"} {
+	for _, key := range []string{googleKey, "google-key-abcdefghijklmn", "short", "the-exaone-password"} {
 		if strings.Contains(logged, key) {
 			t.Errorf("api key '%s' was not masked: %s", key, logged)
 		}
 	}
-	for _, suffix := range []string{"********6789", "********klmn", "********wxyz"} {
+	for _, suffix := range []string{"********6789", "********klmn"} {
 		if !strings.Contains(logged, suffix) {
 			t.Errorf("expected masked key '%s' in: %s", suffix, logged)
 		}
@@ -235,7 +284,7 @@ func TestConfigRedacted(t *testing.T) {
 	if *conf.GoogleAIAPIKey != googleKey ||
 		conf.GoogleAIAPIKeys[0] != "google-key-abcdefghijklmn" ||
 		conf.GoogleAIAPIKeys[1] != "short" ||
-		conf.ExaoneAPIKeys[0] != "exaone-key-opqrstuvwxyz" {
+		conf.ExaoneAccount.Password != "the-exaone-password" {
 		t.Errorf("original config was modified: %+v", conf)
 	}
 }

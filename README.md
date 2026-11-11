@@ -20,10 +20,12 @@ Create `config.json` file with content:
   "google_ai_models": [
     "gemini-3.6-flash",
   ],
-  // EXAONE API keys and models
-  "exaone_api_keys": [
-    "your-exaone-api-key",
-  ],
+  // (optional) EXAONE account for issuing and renewing an api key automatically, and models
+  //"exaone_account": {
+  //  "email": "your-exaone-id@example.com",
+  //  "password": "your-exaone-password",
+  //  "key_file": "/path/to/exaone-key.json", // (optional) default: `exaone-key.json` in `db_files_dir`
+  //},
   //"exaone_models": [
   //  "k-exaone_v2.5",
   //],
@@ -63,9 +65,11 @@ This application will poll new feeds from `rss_feeds[].feed_urls` with interval 
 
 Then the contents of the new feeds will be fetched using [playwright-go and/or goquery](https://github.com/meinside/simple-scrapper-go).
 
-Fetched contents will be summarized in `desired_language` with your `google_ai_api_keys` and/or `exaone_api_keys` (round-robined for text contents), and cached in `rss_feeds[].cache_filename` in `db_files_dir`.
+Fetched contents will be summarized in `desired_language` with your `google_ai_api_keys` and/or `exaone_account` (round-robined for text contents), and cached in `rss_feeds[].cache_filename` in `db_files_dir`.
 
-At least one of `google_ai_api_key(s)` or `exaone_api_keys` is required. EXAONE API handles text contents only, so with `exaone_api_keys` alone, files (eg. PDF), YouTube videos, and unfetchable urls will be cached with failed summaries (set `rss_feeds[].drop_items_with_failed_summaries` to `true` for omitting them).
+At least one of `google_ai_api_key(s)` or `exaone_account` is required. EXAONE API handles text contents only, so with `exaone_account` alone, files (eg. PDF), YouTube videos, and unfetchable urls will be cached with failed summaries (set `rss_feeds[].drop_items_with_failed_summaries` to `true` for omitting them).
+
+With `exaone_account`, an EXAONE api key is issued (and renewed before it expires in 30 days) with [exaone-authorizer](https://github.com/meinside/exaone-authorizer), and kept in `key_file`. Issuing a key replaces the account's previous one, so do not share the account with other machines. The application exits on start when it cannot get a key, eg. with a wrong password.
 
 Resulting RSS feeds' RSS XML will be served on: yourserver:`rss_server_port`/`rss_feeds[].serve_path`(eg. `localhost:8080/tech`).
 
@@ -96,6 +100,13 @@ RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
+```
+
+With `exaone_account`, each start may log in once and repeated failed logins lock the account, so limit the restarts (`Restart=always` restarts even after a clean exit) by adding these to `[Unit]`:
+
+```
+StartLimitIntervalSec=1h
+StartLimitBurst=3
 ```
 
 ## license
