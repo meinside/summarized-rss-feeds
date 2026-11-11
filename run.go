@@ -51,7 +51,7 @@ var _paywalledSitesURLs = []string{
 // run with config
 func run(conf config) {
 	if conf.Verbose {
-		log.Printf("> running with config: %s", rf.Prettify(conf))
+		log.Printf("> running with config: %s", rf.Prettify(conf.redacted()))
 	}
 
 	// api keys
@@ -64,6 +64,10 @@ func run(conf config) {
 	}
 	slices.Sort(apiKeys)
 	apiKeys = slices.Compact(apiKeys)
+
+	exaoneAPIKeys := slices.Clone(conf.ExaoneAPIKeys)
+	slices.Sort(exaoneAPIKeys)
+	exaoneAPIKeys = slices.Compact(exaoneAPIKeys)
 
 	// feed configs for serving
 	feedConfs := map[*rf.Client]configRSSFeed{}
@@ -80,6 +84,12 @@ func run(conf config) {
 		); err == nil {
 			if len(conf.GoogleAIModels) > 0 {
 				client.SetGoogleAIModels(conf.GoogleAIModels)
+			}
+			if len(exaoneAPIKeys) > 0 {
+				client.SetExaoneAPIKeys(exaoneAPIKeys)
+				if len(conf.ExaoneModels) > 0 {
+					client.SetExaoneModels(conf.ExaoneModels)
+				}
 			}
 			client.SetDesiredLanguage(*conf.DesiredLanguage)
 			client.SetVerbose(conf.Verbose)
@@ -122,7 +132,7 @@ func run(conf config) {
 
 	// serve RSS feeds
 	if conf.Verbose {
-		log.Printf("> serving with config: %s", rf.Prettify(conf))
+		log.Printf("> serving with config: %s", rf.Prettify(conf.redacted()))
 	}
 	serve(conf, feedConfs, cancel)
 }
