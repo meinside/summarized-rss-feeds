@@ -1,6 +1,6 @@
 # summarized-rss-feeds
 
-Fetch RSS/Atom/JSON feeds, summarize each of them with Google Gemini API, and then serve them as another RSS XML.
+Fetch RSS/Atom/JSON feeds, summarize each of them with Google Gemini API and/or [EXAONE API](https://docs.exaone.ai), and then serve them as another RSS XML.
 
 ## build
 
@@ -20,6 +20,13 @@ Create `config.json` file with content:
   "google_ai_models": [
     "gemini-3.6-flash",
   ],
+  // EXAONE API keys and models
+  "exaone_api_keys": [
+    "your-exaone-api-key",
+  ],
+  //"exaone_models": [
+  //  "k-exaone_v2.5",
+  //],
   "db_files_dir": "/path/to/summarized-rss-feeds/caches/",
   "desired_language": "Korean",
   "verbose": false,
@@ -56,7 +63,9 @@ This application will poll new feeds from `rss_feeds[].feed_urls` with interval 
 
 Then the contents of the new feeds will be fetched using [playwright-go and/or goquery](https://github.com/meinside/simple-scrapper-go).
 
-Fetched contents will be summarized in `desired_language` with your `google_ai_api_keys`, and cached in `rss_feeds[].cache_filename` in `db_files_dir`.
+Fetched contents will be summarized in `desired_language` with your `google_ai_api_keys` and/or `exaone_api_keys` (round-robined for text contents), and cached in `rss_feeds[].cache_filename` in `db_files_dir`.
+
+At least one of `google_ai_api_key(s)` or `exaone_api_keys` is required. EXAONE API handles text contents only, so with `exaone_api_keys` alone, files (eg. PDF), YouTube videos, and unfetchable urls will be cached with failed summaries (set `rss_feeds[].drop_items_with_failed_summaries` to `true` for omitting them).
 
 Resulting RSS feeds' RSS XML will be served on: yourserver:`rss_server_port`/`rss_feeds[].serve_path`(eg. `localhost:8080/tech`).
 

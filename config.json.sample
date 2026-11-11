@@ -5,6 +5,14 @@
   "google_ai_models": [
     "gemini-3.6-flash"
   ],
+  // EXAONE API keys and models
+  // (at least one of `google_ai_api_keys` or `exaone_api_keys` is required)
+  "exaone_api_keys": [
+    "sk-abcdefghijklmnopqrstuvwyz012345679"
+  ],
+  //"exaone_models": [
+  //  "k-exaone_v2.5"
+  //],
   "db_files_dir": "/path/to/summarized-rss-feeds/caches/",
   "desired_language": "Korean",
   "verbose": false,

@@ -24,6 +24,11 @@ type config struct {
 	GoogleAIAPIKey   *string  `json:"google_ai_api_key,omitempty"`
 	GoogleAIAPIKeys  []string `json:"google_ai_api_keys,omitempty"`
 	GoogleAIModels   []string `json:"google_ai_models,omitempty"`
+	// EXAONE api keys are round-robined with Gemini for text contents only:
+	// without Gemini, files, YouTube videos, and unfetchable urls are cached
+	// with a failed summary (see `drop_items_with_failed_summaries`)
+	ExaoneAPIKeys    []string `json:"exaone_api_keys,omitempty"`
+	ExaoneModels     []string `json:"exaone_models,omitempty"` // library default when empty
 	DBFilesDirectory string   `json:"db_files_dir"`
 	DesiredLanguage  *string  `json:"desired_language,omitempty"`
 	Verbose          bool     `json:"verbose,omitempty"`
@@ -61,8 +66,8 @@ func readConfig(filepath string) (conf config, err error) {
 		if bytes, err = rf.StandardizeJSON(bytes); err == nil {
 			if err = json.Unmarshal(bytes, &conf); err == nil {
 				// validate required fields
-				if conf.GoogleAIAPIKey == nil && len(conf.GoogleAIAPIKeys) == 0 {
-					return conf, fmt.Errorf("at least one of 'google_ai_api_key' or 'google_ai_api_keys' is required")
+				if conf.GoogleAIAPIKey == nil && len(conf.GoogleAIAPIKeys) == 0 && len(conf.ExaoneAPIKeys) == 0 {
+					return conf, fmt.Errorf("at least one of 'google_ai_api_key', 'google_ai_api_keys', or 'exaone_api_keys' is required")
 				}
 				if conf.DBFilesDirectory == "" {
 					return conf, fmt.Errorf("'db_files_dir' is required")

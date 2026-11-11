@@ -163,6 +163,51 @@ func TestReadConfig_InvalidPort(t *testing.T) {
 	}
 }
 
+func TestReadConfig_ExaoneAPIKeys(t *testing.T) {
+	content := `{
+		"google_ai_api_keys": ["key1"],
+		"exaone_api_keys": ["exaone-key1", "exaone-key2"],
+		"exaone_models": ["exaone-model"],
+		"db_files_dir": "/tmp",
+		"rss_feeds": [{"name":"t","cache_filename":"t.db","serve_path":"/t","feed_urls":["https://example.com/rss"]}],
+		"rss_server_port": 8080
+	}`
+	path := writeTestConfig(t, content)
+
+	conf, err := readConfig(path)
+	if err != nil {
+		t.Fatalf("readConfig() error: %s", err)
+	}
+
+	if len(conf.ExaoneAPIKeys) != 2 || conf.ExaoneAPIKeys[0] != "exaone-key1" || conf.ExaoneAPIKeys[1] != "exaone-key2" {
+		t.Errorf("expected 2 exaone api keys, got %v", conf.ExaoneAPIKeys)
+	}
+	if len(conf.ExaoneModels) != 1 || conf.ExaoneModels[0] != "exaone-model" {
+		t.Errorf("expected exaone model, got %v", conf.ExaoneModels)
+	}
+}
+
+func TestReadConfig_ExaoneAPIKeysOnly(t *testing.T) {
+	content := `{
+		"exaone_api_keys": ["exaone-key1"],
+		"db_files_dir": "/tmp",
+		"rss_feeds": [{"name":"t","cache_filename":"t.db","serve_path":"/t","feed_urls":["https://example.com/rss"]}],
+		"rss_server_port": 8080
+	}`
+	path := writeTestConfig(t, content)
+
+	conf, err := readConfig(path)
+	if err != nil {
+		t.Fatalf("readConfig() error: %s", err)
+	}
+	if conf.GoogleAIAPIKey != nil || len(conf.GoogleAIAPIKeys) != 0 {
+		t.Errorf("expected no google ai api keys, got %v, %v", conf.GoogleAIAPIKey, conf.GoogleAIAPIKeys)
+	}
+	if len(conf.ExaoneAPIKeys) != 1 || conf.ExaoneAPIKeys[0] != "exaone-key1" {
+		t.Errorf("expected 1 exaone api key, got %v", conf.ExaoneAPIKeys)
+	}
+}
+
 func TestReadConfig_SingleAPIKey(t *testing.T) {
 	content := `{
 		"google_ai_api_key": "single-key",
