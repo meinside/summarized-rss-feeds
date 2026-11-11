@@ -69,6 +69,8 @@ Fetched contents will be summarized in `desired_language` with your `google_ai_a
 
 At least one of `google_ai_api_key(s)` or `exaone_account` is required. EXAONE API handles text contents only, so with `exaone_account` alone, files (eg. PDF), YouTube videos, and unfetchable urls will be cached with failed summaries (set `rss_feeds[].drop_items_with_failed_summaries` to `true` for omitting them).
 
+When API quotas are exhausted for an hour or longer (eg. Gemini's daily quota), new items which cannot be summarized are also cached with failed summaries (with the time of recovery) instead of piling up, so that they do not use up the recovered quota at once.
+
 With `exaone_account`, an EXAONE api key is issued (and renewed before it expires in 30 days) with [exaone-authorizer](https://github.com/meinside/exaone-authorizer), and kept in `key_file`. Issuing a key replaces the account's previous one, so do not share the account with other machines. The application exits on start when it cannot get a key, eg. with a wrong password.
 
 Resulting RSS feeds' RSS XML will be served on: yourserver:`rss_server_port`/`rss_feeds[].serve_path`(eg. `localhost:8080/tech`).
