@@ -97,8 +97,8 @@ github.com/meinside/gemini-things-go v0.5.60 h1:idMgLXYlRmqWpwXzbOQje1ogYVs/VRRK
 github.com/meinside/gemini-things-go v0.5.60/go.mod h1:sC/G1mPpTU1I9Ryp52JvyF/OLU4iBClyPfcZgSTqwvo=
 github.com/meinside/randomized-string-generator-go v0.0.1 h1:Pz1rHWe6QY5SKk68/XbYJBtA4Qro4JdxfUtzEMnjWC0=
 github.com/meinside/randomized-string-generator-go v0.0.1/go.mod h1:3Vw7LjCeK+xoR3y91MDZgoe3HgfxZvFZ8q2Mi3k3yx4=
-github.com/meinside/rss-feeds-go v0.5.1 h1:GdXtA0xJXt69OlL5Ou9ST2Y5w1dl2m8SKB6TNvsD3dA=
-github.com/meinside/rss-feeds-go v0.5.1/go.mod h1:wthBLLuDBMQ3HoQVS9C/MFyX0N9xJ0u+TVqtv6p9bkc=
+github.com/meinside/rss-feeds-go v0.5.2 h1:iioSXnPnuJg88m2m5EO64AuEWz0IgTRqtYXzLP4gfQA=
+github.com/meinside/rss-feeds-go v0.5.2/go.mod h1:rjw56Bt/VkdIQxEaA8zING6wMog+m+z63ut/nYOFGHU=
 github.com/meinside/simple-scrapper-go v0.0.19 h1:0qT9TZ85WDqljfgLCppbLTdNIAQ3JIINw94BWAisV+A=
 github.com/meinside/simple-scrapper-go v0.0.19/go.mod h1:k7inWHVz0leOMPkSy4fqd55WHtyheJnETosA7QeiQeg=
 github.com/mmcdole/gofeed v1.5.0 h1:g5uott2G5jDZmB38VHJzlIuvDIBQMurteRgGLpBd3SY=
