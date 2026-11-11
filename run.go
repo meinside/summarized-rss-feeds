@@ -51,7 +51,7 @@ var _paywalledSitesURLs = []string{
 // run with config
 func run(conf config) {
 	if conf.Verbose {
-		log.Printf("> running with config: %s", rf.Prettify(conf))
+		log.Printf("> running with config: %s", rf.Prettify(conf.redacted()))
 	}
 
 	// api keys
@@ -132,7 +132,7 @@ func run(conf config) {
 
 	// serve RSS feeds
 	if conf.Verbose {
-		log.Printf("> serving with config: %s", rf.Prettify(conf))
+		log.Printf("> serving with config: %s", rf.Prettify(conf.redacted()))
 	}
 	serve(conf, feedConfs, cancel)
 }

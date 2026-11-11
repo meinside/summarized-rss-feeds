@@ -59,6 +59,45 @@ type configRSSFeed struct {
 	DropItemsWithFailedSummaries bool `json:"drop_items_with_failed_summaries,omitempty"`
 }
 
+// redacted returns a copy of the config with api keys masked, for logging.
+func (c config) redacted() config {
+	if c.GoogleAIAPIKey != nil {
+		c.GoogleAIAPIKey = new(maskAPIKey(*c.GoogleAIAPIKey))
+	}
+	c.GoogleAIAPIKeys = maskAPIKeys(c.GoogleAIAPIKeys)
+	c.ExaoneAPIKeys = maskAPIKeys(c.ExaoneAPIKeys)
+	return c
+}
+
+// maskAPIKeys returns a new slice of masked api keys (nil for nil).
+func maskAPIKeys(keys []string) []string {
+	if keys == nil {
+		return nil
+	}
+	masked := make([]string, len(keys))
+	for i, key := range keys {
+		masked[i] = maskAPIKey(key)
+	}
+	return masked
+}
+
+// maskAPIKey masks given api key, leaving only its last few characters for
+// telling keys apart.
+//
+// NOTE: short keys are masked entirely, as their last characters would be a
+// large part of them.
+func maskAPIKey(key string) string {
+	const (
+		visibleChars     = 4
+		minLenForVisible = 16
+		mask             = "********"
+	)
+	if len(key) < minLenForVisible {
+		return mask
+	}
+	return mask + key[len(key)-visibleChars:]
+}
+
 // read config from given `filepath`
 func readConfig(filepath string) (conf config, err error) {
 	var bytes []byte

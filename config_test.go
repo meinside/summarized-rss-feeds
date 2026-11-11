@@ -4,6 +4,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	rf "github.com/meinside/rss-feeds-go"
 )
 
 func writeTestConfig(t *testing.T, content string) string {
@@ -205,6 +207,36 @@ func TestReadConfig_ExaoneAPIKeysOnly(t *testing.T) {
 	}
 	if len(conf.ExaoneAPIKeys) != 1 || conf.ExaoneAPIKeys[0] != "exaone-key1" {
 		t.Errorf("expected 1 exaone api key, got %v", conf.ExaoneAPIKeys)
+	}
+}
+
+func TestConfigRedacted(t *testing.T) {
+	googleKey := "google-single-key-0123456789"
+	conf := config{
+		GoogleAIAPIKey:  &googleKey,
+		GoogleAIAPIKeys: []string{"google-key-abcdefghijklmn", "short"},
+		ExaoneAPIKeys:   []string{"exaone-key-opqrstuvwxyz"},
+	}
+
+	logged := rf.Prettify(conf.redacted())
+
+	for _, key := range []string{googleKey, "google-key-abcdefghijklmn", "short", "exaone-key-opqrstuvwxyz"} {
+		if strings.Contains(logged, key) {
+			t.Errorf("api key '%s' was not masked: %s", key, logged)
+		}
+	}
+	for _, suffix := range []string{"********6789", "********klmn", "********wxyz"} {
+		if !strings.Contains(logged, suffix) {
+			t.Errorf("expected masked key '%s' in: %s", suffix, logged)
+		}
+	}
+
+	// the original config must be left untouched
+	if *conf.GoogleAIAPIKey != googleKey ||
+		conf.GoogleAIAPIKeys[0] != "google-key-abcdefghijklmn" ||
+		conf.GoogleAIAPIKeys[1] != "short" ||
+		conf.ExaoneAPIKeys[0] != "exaone-key-opqrstuvwxyz" {
+		t.Errorf("original config was modified: %+v", conf)
 	}
 }
 
