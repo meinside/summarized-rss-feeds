@@ -3,7 +3,8 @@
     "AIabcdefghijklmnopqrstuvwxyz0123456789"
   ],
   "google_ai_models": [
-    "gemini-3.6-flash"
+    "gemini-3.8-flash",
+    "gemini-4-hydrogen"
   ],
   // (optional) EXAONE account for issuing and renewing an api key automatically, and models
   // (at least one of `google_ai_api_keys` or `exaone_account` is required)
