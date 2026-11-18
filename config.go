@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	defaultGoogleAIModel   = `gemini-3.6-flash`
+	defaultGoogleAIModel   = `gemini-3.8-flash`
 	defaultDesiredLanguage = `English`
 
 	defaultFetchFeedsIntervalSeconds = 60 * 3 // = 3 minutes
@@ -37,7 +37,7 @@ type config struct {
 	ExaoneModels     []string             `json:"exaone_models,omitempty"` // library default when empty
 	DBFilesDirectory string               `json:"db_files_dir"`
 	DesiredLanguage  *string              `json:"desired_language,omitempty"`
-	Verbose          bool     `json:"verbose,omitempty"`
+	Verbose          bool                 `json:"verbose,omitempty"`
 
 	// RSS
 	RSSFeeds                  []configRSSFeed `json:"rss_feeds"`
