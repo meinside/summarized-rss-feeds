@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/mmcdole/gofeed"
+	"google.golang.org/genai"
 
 	rf "github.com/meinside/rss-feeds-go"
 	ssg "github.com/meinside/simple-scrapper-go"
@@ -91,6 +92,9 @@ func run(conf config) {
 		); err == nil {
 			if len(conf.GoogleAIModels) > 0 {
 				client.SetGoogleAIModels(conf.GoogleAIModels)
+			}
+			if conf.GoogleAIThinkingLevel != "" {
+				client.SetGoogleAIThinkingLevel(genai.ThinkingLevel(conf.GoogleAIThinkingLevel))
 			}
 			if exaoneHTTPClient != nil {
 				client.SetExaoneAPIKeys([]string{exaonePlaceholderAPIKey})
