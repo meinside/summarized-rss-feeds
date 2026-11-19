@@ -18,7 +18,7 @@ Create `config.json` file with content:
     "AIabcdefghijklmnopqrstuvwxyz0123456789",
   ],
   "google_ai_models": [
-    "gemini-3.6-flash",
+    "gemini-3.8-flash",
   ],
   //"google_ai_thinking_level": "LOW", // (optional) one of MINIMAL, LOW, MEDIUM, HIGH (default: not sent)
   // (optional) EXAONE account for issuing and renewing an api key automatically, and models

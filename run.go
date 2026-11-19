@@ -26,7 +26,7 @@ import (
 const (
 	defaultPublishTitle       = "Published RSS Feeds"
 	defaultPublishLink        = "https://github.com/meinside"
-	defaultPublishDescription = "Published RSS Feeds, summarized with Google Gemini API"
+	defaultPublishDescription = "Published RSS Feeds, summarized with Google Gemini API and/or EXAONE API"
 	defaultPublishAuthor      = "summarized-rss-feeds"
 	defaultPublishEmail       = "noreply@no-such-domain.com"
 )
@@ -144,7 +144,7 @@ func run(conf config) {
 
 	// serve RSS feeds
 	if conf.Verbose {
-		log.Printf("> serving with config: %s", rf.Prettify(conf.redacted()))
+		log.Printf("> serving %d feed(s) on port %d", len(feedConfs), conf.RSSServerPort)
 	}
 	serve(conf, feedConfs, cancel)
 }
