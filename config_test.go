@@ -259,6 +259,44 @@ func TestReadConfig_ExaoneAccountInvalid(t *testing.T) {
 	}
 }
 
+func TestReadConfig_GoogleAIThinkingLevel(t *testing.T) {
+	for name, tc := range map[string]struct {
+		field   string
+		want    string
+		wantErr string
+	}{
+		"not set":          {field: ``, want: ""},
+		"upper case":       {field: `"google_ai_thinking_level": "LOW",`, want: "LOW"},
+		"case insensitive": {field: `"google_ai_thinking_level": "minimal",`, want: "MINIMAL"},
+		"invalid":          {field: `"google_ai_thinking_level": "lowest",`, wantErr: "google_ai_thinking_level"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			content := `{
+				"google_ai_api_keys": ["key1"],
+				` + tc.field + `
+				"db_files_dir": "/tmp",
+				"rss_feeds": [{"name":"t","cache_filename":"t.db","serve_path":"/t","feed_urls":["https://example.com/rss"]}],
+				"rss_server_port": 8080
+			}`
+			path := writeTestConfig(t, content)
+
+			conf, err := readConfig(path)
+			if tc.wantErr != "" {
+				if err == nil || !strings.Contains(err.Error(), tc.wantErr) {
+					t.Errorf("expected error containing %q, got %v", tc.wantErr, err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("readConfig() error: %s", err)
+			}
+			if conf.GoogleAIThinkingLevel != tc.want {
+				t.Errorf("google_ai_thinking_level = %q, want %q", conf.GoogleAIThinkingLevel, tc.want)
+			}
+		})
+	}
+}
+
 func TestConfigRedacted(t *testing.T) {
 	googleKey := "google-single-key-0123456789"
 	conf := config{

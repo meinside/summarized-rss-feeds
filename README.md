@@ -18,8 +18,9 @@ Create `config.json` file with content:
     "AIabcdefghijklmnopqrstuvwxyz0123456789",
   ],
   "google_ai_models": [
-    "gemini-3.6-flash",
+    "gemini-3.8-flash",
   ],
+  //"google_ai_thinking_level": "LOW", // (optional) one of MINIMAL, LOW, MEDIUM, HIGH (default: not sent)
   // (optional) EXAONE account for issuing and renewing an api key automatically, and models
   //"exaone_account": {
   //  "email": "your-exaone-id@example.com",
@@ -70,6 +71,8 @@ Fetched contents will be summarized in `desired_language` with your `google_ai_a
 At least one of `google_ai_api_key(s)` or `exaone_account` is required. EXAONE API handles text contents only, so with `exaone_account` alone, files (eg. PDF), YouTube videos, and unfetchable urls will be cached with failed summaries (set `rss_feeds[].drop_items_with_failed_summaries` to `true` for omitting them).
 
 When API quotas are exhausted for an hour or longer (eg. Gemini's daily quota), new items which cannot be summarized are also cached with failed summaries (with the time of recovery) instead of piling up, so that they do not use up the recovered quota at once.
+
+With multiple `google_ai_models`, a request which times out is retried with another model. Items which time out with every model, or whose urls cannot be retrieved even by Gemini, are cached with failed summaries.
 
 With `exaone_account`, an EXAONE api key is issued (and renewed before it expires in 30 days) with [exaone-authorizer](https://github.com/meinside/exaone-authorizer), and kept in `key_file`. Issuing a key replaces the account's previous one, so do not share the account with other machines. The application exits on start when it cannot get a key, eg. with a wrong password.
 

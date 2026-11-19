@@ -7,6 +7,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
+
+	"google.golang.org/genai"
 
 	rf "github.com/meinside/rss-feeds-go"
 )
@@ -27,6 +31,10 @@ type config struct {
 	GoogleAIAPIKey  *string  `json:"google_ai_api_key,omitempty"`
 	GoogleAIAPIKeys []string `json:"google_ai_api_keys,omitempty"`
 	GoogleAIModels  []string `json:"google_ai_models,omitempty"`
+	// Thinking level of Gemini requests (one of `googleAIThinkingLevels`, case
+	// insensitive). Not sent when empty, as a model which does not support
+	// thinking levels may reject the request.
+	GoogleAIThinkingLevel string `json:"google_ai_thinking_level,omitempty"`
 	// EXAONE account for issuing and renewing an api key automatically (keys
 	// expire in 30 days, so static keys are not supported).
 	//
@@ -47,6 +55,14 @@ type config struct {
 
 	// RSS server port
 	RSSServerPort int `json:"rss_server_port"`
+}
+
+// googleAIThinkingLevels are the accepted values of `google_ai_thinking_level`
+var googleAIThinkingLevels = []genai.ThinkingLevel{
+	genai.ThinkingLevelMinimal,
+	genai.ThinkingLevelLow,
+	genai.ThinkingLevelMedium,
+	genai.ThinkingLevelHigh,
 }
 
 // configRSSFeed struct
@@ -147,6 +163,13 @@ func readConfig(configFilepath string) (conf config, err error) {
 				}
 				if conf.RSSServerPort <= 0 {
 					return conf, fmt.Errorf("'rss_server_port' must be a positive number")
+				}
+				// NOTE: checked here, or every request would fail with it
+				if conf.GoogleAIThinkingLevel != "" {
+					conf.GoogleAIThinkingLevel = strings.ToUpper(conf.GoogleAIThinkingLevel)
+					if !slices.Contains(googleAIThinkingLevels, genai.ThinkingLevel(conf.GoogleAIThinkingLevel)) {
+						return conf, fmt.Errorf("'google_ai_thinking_level' must be one of %v, got '%s'", googleAIThinkingLevels, conf.GoogleAIThinkingLevel)
+					}
 				}
 
 				// set default values

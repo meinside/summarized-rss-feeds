@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/mmcdole/gofeed"
+	"google.golang.org/genai"
 
 	rf "github.com/meinside/rss-feeds-go"
 	ssg "github.com/meinside/simple-scrapper-go"
@@ -25,7 +26,7 @@ import (
 const (
 	defaultPublishTitle       = "Published RSS Feeds"
 	defaultPublishLink        = "https://github.com/meinside"
-	defaultPublishDescription = "Published RSS Feeds, summarized with Google Gemini API"
+	defaultPublishDescription = "Published RSS Feeds, summarized with Google Gemini API and/or EXAONE API"
 	defaultPublishAuthor      = "summarized-rss-feeds"
 	defaultPublishEmail       = "noreply@no-such-domain.com"
 )
@@ -92,6 +93,9 @@ func run(conf config) {
 			if len(conf.GoogleAIModels) > 0 {
 				client.SetGoogleAIModels(conf.GoogleAIModels)
 			}
+			if conf.GoogleAIThinkingLevel != "" {
+				client.SetGoogleAIThinkingLevel(genai.ThinkingLevel(conf.GoogleAIThinkingLevel))
+			}
 			if exaoneHTTPClient != nil {
 				client.SetExaoneAPIKeys([]string{exaonePlaceholderAPIKey})
 				client.SetExaoneHTTPClient(exaoneHTTPClient)
@@ -140,7 +144,7 @@ func run(conf config) {
 
 	// serve RSS feeds
 	if conf.Verbose {
-		log.Printf("> serving with config: %s", rf.Prettify(conf.redacted()))
+		log.Printf("> serving %d feed(s) on port %d", len(feedConfs), conf.RSSServerPort)
 	}
 	serve(conf, feedConfs, cancel)
 }

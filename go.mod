@@ -4,9 +4,10 @@ go 1.26.0
 
 require (
 	github.com/meinside/exaone-authorizer v0.0.0
-	github.com/meinside/rss-feeds-go v0.5.3
+	github.com/meinside/rss-feeds-go v0.5.4
 	github.com/meinside/simple-scrapper-go v0.0.19
 	github.com/mmcdole/gofeed v1.5.0
+	google.golang.org/genai v1.79.1
 )
 
 require (
@@ -44,7 +45,7 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/mattn/go-sqlite3 v1.14.53 // indirect
-	github.com/meinside/gemini-things-go v0.5.61 // indirect
+	github.com/meinside/gemini-things-go v0.5.63 // indirect
 	github.com/meinside/randomized-string-generator-go v0.0.1 // indirect
 	github.com/mmcdole/goxpp/v2 v2.0.0 // indirect
 	github.com/modelcontextprotocol/go-sdk v1.8.0 // indirect
@@ -75,10 +76,9 @@ require (
 	golang.org/x/text v0.44.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
 	google.golang.org/api v0.316.0 // indirect
-	google.golang.org/genai v1.79.0 // indirect
-	google.golang.org/genproto v0.0.0-20261116203732-fd2c7689a808 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20261116203732-fd2c7689a808 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261116203732-fd2c7689a808 // indirect
+	google.golang.org/genproto v0.0.0-20261118221215-c8830f628b3f // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20261118221215-c8830f628b3f // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261118221215-c8830f628b3f // indirect
 	google.golang.org/grpc v1.85.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gorm.io/driver/sqlite v1.6.0 // indirect
