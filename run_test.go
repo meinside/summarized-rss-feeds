@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/mmcdole/gofeed"
@@ -58,6 +59,56 @@ func TestRequestPermitted(t *testing.T) {
 
 			if got := requestPermitted(r, conf); got != tt.want {
 				t.Errorf("requestPermitted() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPermitOrForbid(t *testing.T) {
+	tests := []struct {
+		name       string
+		userAgent  string
+		permitted  []string
+		want       bool
+		wantStatus int
+		wantVary   bool
+	}{
+		{name: "no restriction", userAgent: "curl/7.68", permitted: nil, want: true, wantStatus: http.StatusOK},
+		{name: "permitted agent", userAgent: "Feedly/1.0", permitted: []string{"Feedly"}, want: true, wantStatus: http.StatusOK, wantVary: true},
+		{name: "non-permitted agent", userAgent: "curl/7.68", permitted: []string{"Feedly"}, want: false, wantStatus: http.StatusForbidden, wantVary: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := httptest.NewRequest(http.MethodGet, "/", nil)
+			r.Header.Set("User-Agent", tt.userAgent)
+			w := httptest.NewRecorder()
+
+			if got := permitOrForbid(w, r, config{PermittedUserAgents: tt.permitted}); got != tt.want {
+				t.Errorf("permitOrForbid() = %v, want %v", got, tt.want)
+			}
+			if w.Code != tt.wantStatus {
+				t.Errorf("status = %d, want %d", w.Code, tt.wantStatus)
+			}
+			if vary := w.Header().Get("Vary"); (vary == "User-Agent") != tt.wantVary {
+				t.Errorf("Vary = %q, want User-Agent: %v", vary, tt.wantVary)
+			}
+
+			body := w.Body.String()
+			if tt.want {
+				if body != "" {
+					t.Errorf("expected nothing written for a permitted request, got %q", body)
+				}
+				return
+			}
+			if !strings.Contains(body, forbiddenUserAgentMessage) {
+				t.Errorf("body = %q, want %q", body, forbiddenUserAgentMessage)
+			}
+			if strings.Contains(body, tt.userAgent) || strings.Contains(body, "Feedly") {
+				t.Errorf("body must not contain user agents: %q", body)
+			}
+			if ct := w.Header().Get("Content-Type"); !strings.HasPrefix(ct, "text/plain") {
+				t.Errorf("Content-Type = %q, want text/plain", ct)
 			}
 		})
 	}

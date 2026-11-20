@@ -3,7 +3,7 @@ module summarized-rss-feeds
 go 1.26.0
 
 require (
-	github.com/meinside/exaone-authorizer v0.0.0
+	github.com/meinside/exaone-authorizer v0.0.1
 	github.com/meinside/rss-feeds-go v0.5.4
 	github.com/meinside/simple-scrapper-go v0.0.19
 	github.com/mmcdole/gofeed v1.5.0

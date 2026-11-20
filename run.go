@@ -239,7 +239,7 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed, cancelFunc conte
 		}
 
 		mux.HandleFunc(path.Join("/", feedConf.ServePath), func(w http.ResponseWriter, r *http.Request) {
-			if requestPermitted(r, conf) {
+			if permitOrForbid(w, r, conf) {
 				// fetch cached items,
 				items := client.ListCachedItems(true)
 
@@ -272,8 +272,6 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed, cancelFunc conte
 					log.Printf("# failed to serve RSS feeds: %s", err)
 					w.WriteHeader(http.StatusInternalServerError)
 				}
-			} else {
-				w.WriteHeader(http.StatusUnauthorized)
 			}
 		})
 	}
@@ -310,6 +308,31 @@ func serve(conf config, feedConfs map[*rf.Client]configRSSFeed, cancelFunc conte
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Printf("# failed to start server: %s", err)
 	}
+}
+
+// forbiddenUserAgentMessage is the body of responses to non-permitted user
+// agents.
+//
+// NOTE: neither the requester's user agent nor the permitted ones are put in
+// it: the former is known to the requester already, and the latter would tell
+// how to get around the restriction (user agents can be forged).
+const forbiddenUserAgentMessage = "403 forbidden: user agent not permitted"
+
+// permitOrForbid reports whether given http request is permitted, responding
+// with 403 when it is not.
+func permitOrForbid(w http.ResponseWriter, r *http.Request, conf config) bool {
+	if len(conf.PermittedUserAgents) > 0 {
+		// NOTE: responses differ by user agent, so caches must not serve one
+		// user agent's response (eg. 200 with `Cache-Control: max-age`) to another
+		w.Header().Add("Vary", "User-Agent")
+	}
+
+	if requestPermitted(r, conf) {
+		return true
+	}
+
+	http.Error(w, forbiddenUserAgentMessage, http.StatusForbidden)
+	return false
 }
 
 // check if given http request is permitted
